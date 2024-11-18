@@ -39,6 +39,17 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Prisma considerations[]
+
+```bash
+npx prisma generate
+```
+
+- When adding, removing, or updating models or fields.  
+- When changing relationships between models.  
+- When setting up Prisma for the first time in a project.
+- If you update the `@prisma/client` package, you need to regenerate the client to ensure compatibility with the new version.
+
 ## ENV configuration
 
 ```bash
