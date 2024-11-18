@@ -21,6 +21,7 @@ export class UsersService {
       name: body.name,
       email: body.email,
       password: body.password,
+      team_id: body.team_id,
     };
 
     return user;

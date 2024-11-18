@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model user {
+  id       String   @id @default(cuid())
+  email    String   @unique
+  name     String
+  password String
+  team_id  String?  // Clave foránea hacia 'team' (opcional)
+  team     team?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'team'
+  photo    user_photo?
+}
+
+model user_photo {
+  user_id String @id // Clave foránea hacia 'user'
+  photo   Bytes
+  user    user   @relation(fields: [user_id], references: [id], onDelete: Cascade) // Relación con 'user'
+}
+
+model team {
+  id       String   @id @default(cuid())
+  name     String
+  photo    team_photo?
+  users    user[]
+  players  player[]
+}
+
+model team_photo {
+  team_id String @id // Clave foránea hacia 'team'
+  photo   Bytes
+  team    team   @relation(fields: [team_id], references: [id], onDelete: Cascade) // Relación con 'team'
+}
+
+model player {
+  id        String   @id @default(cuid())
+  name      String
+  age       Int
+  team_id   String?  // Clave foránea hacia 'team' (opcional)
+  team      team?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'team'
+}

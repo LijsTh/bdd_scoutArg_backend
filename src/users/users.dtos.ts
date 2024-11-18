@@ -16,4 +16,8 @@ export class CreateUserDto {
   @IsString({ message: 'Password must be a string' })
   @IsNotEmpty({ message: 'Password must not be empty' })
   password: string;
+
+  @IsString({ message: 'Team ID must be a string' })
+  @IsNotEmpty({ message: 'Team ID must not be empty' })
+  team_id: string;
 }
