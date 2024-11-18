@@ -13,40 +13,49 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model user {
+model users {
   id       String   @id @default(cuid())
   email    String   @unique
   name     String
   password String
-  team_id  String?  // Clave foránea hacia 'team' (opcional)
-  team     team?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'team'
-  photo    user_photo?
+  team_id  String?  // Clave foránea hacia 'teams' (opcional)
+  team     teams?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'teams'
+  photo    users_photos?
 }
 
-model user_photo {
-  user_id String @id // Clave foránea hacia 'user'
+model users_photos {
+  user_id String @id // Clave foránea hacia 'users'
   photo   Bytes
-  user    user   @relation(fields: [user_id], references: [id], onDelete: Cascade) // Relación con 'user'
+  user    users   @relation(fields: [user_id], references: [id], onDelete: Cascade) // Relación con 'users'
 }
 
-model team {
+model teams {
   id       String   @id @default(cuid())
   name     String
-  photo    team_photo?
-  users    user[]
-  players  player[]
+  photo    teams_photos?
+  users    users[]
+  players  players[]
 }
 
-model team_photo {
-  team_id String @id // Clave foránea hacia 'team'
+model teams_photos {
+  team_id String @id // Clave foránea hacia 'teams'
   photo   Bytes
-  team    team   @relation(fields: [team_id], references: [id], onDelete: Cascade) // Relación con 'team'
+  team    teams   @relation(fields: [team_id], references: [id], onDelete: Cascade) // Relación con 'teams'
 }
 
-model player {
+model players {
   id        String   @id @default(cuid())
   name      String
   age       Int
-  team_id   String?  // Clave foránea hacia 'team' (opcional)
-  team      team?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'team'
+  position  String
+  number    Int
+  team_id   String?  // Clave foránea hacia 'teams' (opcional)
+  photo     players_photos? // Relación con 'players_photos' 
+  team      teams?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'teams'
+}
+
+model players_photos {
+  player_id String @id // Clave foránea hacia 'player'
+  photo     Bytes
+  player    players @relation(fields: [player_id], references: [id], onDelete: Cascade) // Relación con 'player'
 }
