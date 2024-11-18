@@ -23,7 +23,7 @@
 ## Project setup
 
 ```bash
-$ npm install
+$ npm install -g npm@latest
 ```
 
 ## Compile and run the project
@@ -39,7 +39,7 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Prisma considerations[]
+## Prisma considerations
 
 ```bash
 npx prisma generate
