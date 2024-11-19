@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePlayersPhotoDto } from './dto/create-players_photo.dto';
 import { UpdatePlayersPhotoDto } from './dto/update-players_photo.dto';
+import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class PlayersPhotosService {
+  constructor(private prisma: PrismaService) {}
   create(createPlayersPhotoDto: CreatePlayersPhotoDto) {
     return 'This action adds a new playersPhoto';
   }

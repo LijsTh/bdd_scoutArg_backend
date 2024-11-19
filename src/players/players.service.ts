@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
+import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class PlayersService {
+  constructor(private prisma: PrismaService) {}
   create(createPlayerDto: CreatePlayerDto) {
     return 'This action adds a new player';
   }
