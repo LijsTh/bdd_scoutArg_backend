@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PrismaService } from '../database/prisma/prisma.service';
@@ -39,7 +39,7 @@ export class PlayersService {
     });
 
     if (!player) {
-      throw new Error(`Player with ID ${id} not found`);
+      throw new NotFoundException(`Player with ID ${id} not found`);
     }
 
     return player;
@@ -70,7 +70,7 @@ export class PlayersService {
     const player = await this.prisma.players.findUnique({ where: { id } });
 
     if (!player) {
-      throw new Error(`Player with ID ${id} not found`);
+      throw new NotFoundException(`Player with ID ${id} not found`);
     }
 
     return this.prisma.players.delete({

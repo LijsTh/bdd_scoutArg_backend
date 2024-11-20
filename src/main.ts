@@ -3,6 +3,10 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ValidationError } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { HttpAdapterHost } from '@nestjs/core';
+import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+import { ClassSerializerInterceptor } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
 export function validationExceptionFactory(errors: ValidationError[]) {
   const formattedErrors = errors.reduce(
@@ -33,6 +37,7 @@ async function bootstrap() {
       exceptionFactory: (errors) => validationExceptionFactory(errors),
     }),
   );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const config = new DocumentBuilder()
     .setTitle('Median')
@@ -42,6 +47,9 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   await app.listen(process.env.PORT ?? 3000);
 }

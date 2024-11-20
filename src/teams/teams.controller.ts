@@ -14,9 +14,9 @@ export class TeamsController {
 
   @Post()
   @ApiCreatedResponse({ type: TeamEntity })
-  create(@Body() createTeamDto: CreateTeamDto) {
+  async create(@Body() createTeamDto: CreateTeamDto) {
     return this.teamsService.create(createTeamDto);
-  }
+  } 
 
   @Get()
   @ApiOkResponse({ type: TeamEntity, isArray: true })

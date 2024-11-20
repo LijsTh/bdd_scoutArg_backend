@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTeamsPhotoDto } from './dto/create-teams_photo.dto';
 import { UpdateTeamsPhotoDto } from './dto/update-teams_photo.dto';
 import { PrismaService } from '../database/prisma/prisma.service';
@@ -28,7 +28,7 @@ export class TeamsPhotosService {
     });
 
     if (!teamPhoto) {
-      throw new Error(`Photo for team with ID ${id} not found`);
+      throw new NotFoundException(`Photo for team with ID ${id} not found`);
     }
 
     return teamPhoto;
@@ -42,7 +42,7 @@ export class TeamsPhotosService {
     });
 
     if (!teamPhoto) {
-      throw new Error(`Photo for team with ID ${id} not found`);
+      throw new NotFoundException(`Photo for team with ID ${id} not found`);
     }
 
     return this.prisma.teams_photos.update({
@@ -57,7 +57,7 @@ export class TeamsPhotosService {
     });
 
     if (!teamPhoto) {
-      throw new Error(`Photo for team with ID ${id} not found`);
+      throw new NotFoundException(`Photo for team with ID ${id} not found`);
     }
 
     return this.prisma.teams_photos.delete({

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePlayersPhotoDto } from './dto/create-players_photo.dto';
 import { UpdatePlayersPhotoDto } from './dto/update-players_photo.dto';
 import { PrismaService } from '../database/prisma/prisma.service';
@@ -29,7 +29,7 @@ export class PlayersPhotosService {
     });
 
     if (!playerPhoto) {
-      throw new Error(`Photo for player with ID ${id} not found`);
+      throw new NotFoundException(`Photo for player with ID ${id} not found`);
     }
 
     return playerPhoto;
@@ -43,7 +43,7 @@ export class PlayersPhotosService {
     });
 
     if (!playerPhoto) {
-      throw new Error(`Photo for player with ID ${id} not found`);
+      throw new NotFoundException(`Photo for player with ID ${id} not found`);
     }
 
     return this.prisma.players_photos.update({
@@ -58,7 +58,7 @@ export class PlayersPhotosService {
     });
 
     if (!playerPhoto) {
-      throw new Error(`Photo for player with ID ${id} not found`);
+      throw new NotFoundException(`Photo for player with ID ${id} not found`);
     }
 
     return this.prisma.players_photos.delete({
