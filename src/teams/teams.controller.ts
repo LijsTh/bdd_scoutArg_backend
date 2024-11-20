@@ -4,6 +4,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamEntity } from './entities/team.entity';
+import { PlayerEntity } from '../players/entities/player.entity';
 
 
 @Controller('teams')
@@ -27,6 +28,12 @@ export class TeamsController {
   @ApiOkResponse({ type: TeamEntity })
   findOne(@Param('id') id: string) {
     return this.teamsService.findOne(id);
+  }
+
+  @Get(':id/players')
+  @ApiOkResponse({ type: [PlayerEntity] })
+  async findPlayersByTeam(@Param('id') id: string) {
+    return this.teamsService.findPlayersByTeamId(id);
   }
 
   @Patch(':id')

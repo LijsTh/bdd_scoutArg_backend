@@ -43,6 +43,15 @@ export class TeamsService {
     return team;
   }
 
+  async findPlayersByTeamId(teamId: string) {
+    return this.prisma.teams.findUnique({
+      where: { id: teamId },
+      select: {
+        players: true,  // Seleccionamos los jugadores relacionados con el equipo
+      },
+    });
+  }
+
   async update(id: string, updateTeamDto: UpdateTeamDto) {
     return this.prisma.teams.update({
       where: { id },
