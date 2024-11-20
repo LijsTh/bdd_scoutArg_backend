@@ -5,24 +5,70 @@ import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class TeamsService {
-  constructor(private prisma: PrismaService) {}
-  create(createTeamDto: CreateTeamDto) {
-    return 'This action adds a new team';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createTeamDto: CreateTeamDto) {
+    return this.prisma.teams.create({
+      data: {
+        name: createTeamDto.name,
+        photo: createTeamDto.photo ? { create: { photo: Buffer.from(createTeamDto.photo, 'base64') } } : undefined, // Crea la foto si está presente
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all teams`;
+  async findAll() {
+    return this.prisma.teams.findMany({
+      include: {
+        photo: true, // Incluye la foto del equipo si existe
+        users: true, // Incluye los usuarios asociados
+        players: true, // Incluye los jugadores asociados
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} team`;
+  async findOne(id: string) {
+    const team = await this.prisma.teams.findUnique({
+      where: { id },
+      include: {
+        photo: true, // Incluye la foto si existe
+        users: true, // Incluye los usuarios asociados
+        players: true, // Incluye los jugadores asociados
+      },
+    });
+
+    if (!team) {
+      throw new Error(`Team with ID ${id} not found`);
+    }
+
+    return team;
   }
 
-  update(id: number, updateTeamDto: UpdateTeamDto) {
-    return `This action updates a #${id} team`;
+  async update(id: string, updateTeamDto: UpdateTeamDto) {
+    return this.prisma.teams.update({
+      where: { id },
+      data: {
+        name: updateTeamDto.name,
+        photo: updateTeamDto.photo
+          ? {
+              upsert: {
+                create: { photo: Buffer.from(updateTeamDto.photo, 'base64') }, // Si no existe, crea una nueva
+                update: { photo: Buffer.from(updateTeamDto.photo, 'base64') }, // Si existe, actualiza la foto
+              },
+            }
+          : undefined, // Si no hay foto, no hacer cambios
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} team`;
+  async remove(id: string) {
+    const team = await this.prisma.teams.findUnique({ where: { id } });
+
+    if (!team) {
+      throw new Error(`Team with ID ${id} not found`);
+    }
+
+    return this.prisma.teams.delete({
+      where: { id },
+    });
   }
 }

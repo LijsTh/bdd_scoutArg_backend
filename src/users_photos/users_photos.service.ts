@@ -5,24 +5,63 @@ import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class UsersPhotosService {
-  constructor(private prisma: PrismaService) {}
-  create(createUsersPhotoDto: CreateUsersPhotoDto) {
-    return 'This action adds a new usersPhoto';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createUsersPhotoDto: CreateUsersPhotoDto) {
+    const { user_id, photo } = createUsersPhotoDto;
+
+    return this.prisma.users_photos.create({
+      data: {
+        user_id,
+        photo: Buffer.from(photo, 'base64'),
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all usersPhotos`;
+  async findAll() {
+    return this.prisma.users_photos.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} usersPhoto`;
+  async findOne(id: string) {
+    const userPhoto = await this.prisma.users_photos.findUnique({
+      where: { user_id: id },
+    });
+
+    if (!userPhoto) {
+      throw new Error(`Photo for user with ID ${id} not found`);
+    }
+
+    return userPhoto;
   }
 
-  update(id: number, updateUsersPhotoDto: UpdateUsersPhotoDto) {
-    return `This action updates a #${id} usersPhoto`;
+  async update(id: string, updateUsersPhotoDto: UpdateUsersPhotoDto) {
+    const { photo } = updateUsersPhotoDto;
+
+    const userPhoto = await this.prisma.users_photos.findUnique({
+      where: { user_id: id },
+    });
+
+    if (!userPhoto) {
+      throw new Error(`Photo for user with ID ${id} not found`);
+    }
+
+    return this.prisma.users_photos.update({
+      where: { user_id: id },
+      data: { photo: photo ? Buffer.from(photo, 'base64') : undefined },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} usersPhoto`;
+  async remove(id: string) {
+    const userPhoto = await this.prisma.users_photos.findUnique({
+      where: { user_id: id },
+    });
+
+    if (!userPhoto) {
+      throw new Error(`Photo for user with ID ${id} not found`);
+    }
+
+    return this.prisma.users_photos.delete({
+      where: { user_id: id },
+    });
   }
 }

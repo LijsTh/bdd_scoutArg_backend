@@ -25,18 +25,18 @@ export class PlayersController {
   @Get(':id')
   @ApiOkResponse({ type: PlayerEntity })
   findOne(@Param('id') id: string) {
-    return this.playersService.findOne(+id);
+    return this.playersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiCreatedResponse({ type: PlayerEntity })
   update(@Param('id') id: string, @Body() updatePlayerDto: UpdatePlayerDto) {
-    return this.playersService.update(+id, updatePlayerDto);
+    return this.playersService.update(id, updatePlayerDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: PlayerEntity })
   remove(@Param('id') id: string) {
-    return this.playersService.remove(+id);
+    return this.playersService.remove(id);
   }
 }

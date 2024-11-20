@@ -26,18 +26,18 @@ export class TeamsPhotosController {
   @Get(':id')
   @ApiOkResponse({ type: TeamsPhotoEntity })
   findOne(@Param('id') id: string) {
-    return this.teamsPhotosService.findOne(+id);
+    return this.teamsPhotosService.findOne(id);
   }
 
   @Patch(':id')
   @ApiCreatedResponse({ type: TeamsPhotoEntity })
   update(@Param('id') id: string, @Body() updateTeamsPhotoDto: UpdateTeamsPhotoDto) {
-    return this.teamsPhotosService.update(+id, updateTeamsPhotoDto);
+    return this.teamsPhotosService.update(id, updateTeamsPhotoDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: TeamsPhotoEntity })
   remove(@Param('id') id: string) {
-    return this.teamsPhotosService.remove(+id);
+    return this.teamsPhotosService.remove(id);
   }
 }

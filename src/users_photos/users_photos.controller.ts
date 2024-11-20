@@ -25,18 +25,18 @@ export class UsersPhotosController {
   @Get(':id')
   @ApiOkResponse({ type: UsersPhotoEntity })
   findOne(@Param('id') id: string) {
-    return this.usersPhotosService.findOne(+id);
+    return this.usersPhotosService.findOne(id);
   }
 
   @Patch(':id')
   @ApiCreatedResponse({ type: UsersPhotoEntity })
   update(@Param('id') id: string, @Body() updateUsersPhotoDto: UpdateUsersPhotoDto) {
-    return this.usersPhotosService.update(+id, updateUsersPhotoDto);
+    return this.usersPhotosService.update(id, updateUsersPhotoDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: UsersPhotoEntity })
   remove(@Param('id') id: string) {
-    return this.usersPhotosService.remove(+id);
+    return this.usersPhotosService.remove(id);
   }
 }

@@ -7,23 +7,63 @@ import { PrismaService } from '../database/prisma/prisma.service';
 export class UsersService {
   constructor (private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    return this.prisma.users.create({
+      data: {
+        email: createUserDto.email,
+        name: createUserDto.name,
+        password: createUserDto.password,
+        team_id: createUserDto.team_id ?? null, // Si no tiene equipo, se asigna null
+      },
+    });
   }
 
-  findAll() {
-    return 'This action returns all users';
+  async findAll() {
+    return this.prisma.users.findMany({
+      include: {
+        team: true, // Incluye los detalles del equipo si existe
+        photo: true, // Incluye la foto si existe
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.prisma.users.findUnique({
+      where: { id },
+      include: {
+        team: true, // Incluye el equipo si existe
+        photo: true, // Incluye la foto si existe
+      },
+    });
+
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    return this.prisma.users.update({
+      where: { id },
+      data: {
+        email: updateUserDto.email,
+        name: updateUserDto.name,
+        password: updateUserDto.password,
+        team_id: updateUserDto.team_id ?? null, // Si no tiene equipo, se asigna null
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.prisma.users.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+
+    return this.prisma.users.delete({
+      where: { id },
+    });
   }
 }

@@ -26,18 +26,18 @@ export class TeamsController {
   @Get(':id')
   @ApiOkResponse({ type: TeamEntity })
   findOne(@Param('id') id: string) {
-    return this.teamsService.findOne(+id);
+    return this.teamsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiCreatedResponse({ type: TeamEntity })
   update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto) {
-    return this.teamsService.update(+id, updateTeamDto);
+    return this.teamsService.update(id, updateTeamDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: TeamEntity })
   remove(@Param('id') id: string) {
-    return this.teamsService.remove(+id);
+    return this.teamsService.remove(id);
   }
 }

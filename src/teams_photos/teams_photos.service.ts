@@ -5,24 +5,63 @@ import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class TeamsPhotosService {
-  constructor(private prisma: PrismaService) {}
-  create(createTeamsPhotoDto: CreateTeamsPhotoDto) {
-    return 'This action adds a new teamsPhoto';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createTeamsPhotoDto: CreateTeamsPhotoDto) {
+    const { team_id, photo } = createTeamsPhotoDto;
+
+    return this.prisma.teams_photos.create({
+      data: {
+        team_id,
+        photo: Buffer.from(photo, 'base64'),
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all teamsPhotos`;
+  async findAll() {
+    return this.prisma.teams_photos.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} teamsPhoto`;
+  async findOne(id: string) {
+    const teamPhoto = await this.prisma.teams_photos.findUnique({
+      where: { team_id: id },
+    });
+
+    if (!teamPhoto) {
+      throw new Error(`Photo for team with ID ${id} not found`);
+    }
+
+    return teamPhoto;
   }
 
-  update(id: number, updateTeamsPhotoDto: UpdateTeamsPhotoDto) {
-    return `This action updates a #${id} teamsPhoto`;
+  async update(id: string, updateTeamsPhotoDto: UpdateTeamsPhotoDto) {
+    const { photo } = updateTeamsPhotoDto;
+
+    const teamPhoto = await this.prisma.teams_photos.findUnique({
+      where: { team_id: id },
+    });
+
+    if (!teamPhoto) {
+      throw new Error(`Photo for team with ID ${id} not found`);
+    }
+
+    return this.prisma.teams_photos.update({
+      where: { team_id: id },
+      data: { photo: photo ? Buffer.from(photo, 'base64') : undefined },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} teamsPhoto`;
+  async remove(id: string) {
+    const teamPhoto = await this.prisma.teams_photos.findUnique({
+      where: { team_id: id },
+    });
+
+    if (!teamPhoto) {
+      throw new Error(`Photo for team with ID ${id} not found`);
+    }
+
+    return this.prisma.teams_photos.delete({
+      where: { team_id: id },
+    });
   }
 }

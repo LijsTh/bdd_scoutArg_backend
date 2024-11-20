@@ -5,24 +5,76 @@ import { PrismaService } from '../database/prisma/prisma.service';
 
 @Injectable()
 export class PlayersService {
-  constructor(private prisma: PrismaService) {}
-  create(createPlayerDto: CreatePlayerDto) {
-    return 'This action adds a new player';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createPlayerDto: CreatePlayerDto) {
+    return this.prisma.players.create({
+      data: {
+        name: createPlayerDto.name,
+        age: createPlayerDto.age,
+        position: createPlayerDto.position,
+        number: createPlayerDto.number,
+        team_id: createPlayerDto.team_id ?? null, // Si no tiene equipo, asigna null
+        photo: createPlayerDto.photo ? { create: { photo: Buffer.from(createPlayerDto.photo, 'base64') } } : undefined, // Crea la foto si está presente
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all players`;
+  async findAll() {
+    return this.prisma.players.findMany({
+      include: {
+        photo: true, // Incluye la foto del jugador si existe
+        team: true, // Incluye el equipo asociado si existe
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} player`;
+  async findOne(id: string) {
+    const player = await this.prisma.players.findUnique({
+      where: { id },
+      include: {
+        photo: true, // Incluye la foto si existe
+        team: true, // Incluye el equipo asociado si existe
+      },
+    });
+
+    if (!player) {
+      throw new Error(`Player with ID ${id} not found`);
+    }
+
+    return player;
   }
 
-  update(id: number, updatePlayerDto: UpdatePlayerDto) {
-    return `This action updates a #${id} player`;
+  async update(id: string, updatePlayerDto: UpdatePlayerDto) {
+    return this.prisma.players.update({
+      where: { id },
+      data: {
+        name: updatePlayerDto.name,
+        age: updatePlayerDto.age,
+        position: updatePlayerDto.position,
+        number: updatePlayerDto.number,
+        team_id: updatePlayerDto.team_id ?? null, // Si no tiene equipo, asigna null
+        photo: updatePlayerDto.photo
+          ? {
+              upsert: {
+                create: { photo: Buffer.from(updatePlayerDto.photo, 'base64') }, // Si no existe, crea una nueva
+                update: { photo: Buffer.from(updatePlayerDto.photo, 'base64') }, // Si existe, actualiza la foto
+              },
+            }
+          : undefined, // Si no hay foto, no hacer cambios
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} player`;
+  async remove(id: string) {
+    const player = await this.prisma.players.findUnique({ where: { id } });
+
+    if (!player) {
+      throw new Error(`Player with ID ${id} not found`);
+    }
+
+    return this.prisma.players.delete({
+      where: { id },
+    });
   }
 }
