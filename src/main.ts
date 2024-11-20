@@ -29,6 +29,14 @@ export function validationExceptionFactory(errors: ValidationError[]) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // Habilitar CORS
+  app.enableCors({
+    origin: 'http://localhost:3001', // Permite solicitudes desde tu frontend
+    methods: 'GET, POST, PATCH, DELETE', // Métodos permitidos
+    allowedHeaders: 'Content-Type, Authorization', // Encabezados permitidos
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // Automatically transform payloads to DTO instances
