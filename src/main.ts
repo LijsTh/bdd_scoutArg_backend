@@ -29,11 +29,11 @@ export function validationExceptionFactory(errors: ValidationError[]) {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Habilitar CORS
   app.enableCors({
     origin: 'http://localhost:3001', // Permite solicitudes desde tu frontend
-    methods: 'GET, POST, PATCH, DELETE', // Métodos permitidos
+    methods: 'GET, POST, PUT, DELETE, OPTIONS,PATCH', // Métodos permit
     allowedHeaders: 'Content-Type, Authorization', // Encabezados permitidos
   });
 
