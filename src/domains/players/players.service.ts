@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
-import { PrismaService } from '../database/prisma/prisma.service';
+import { PrismaService } from '../../database/prisma/prisma.service';
 
 @Injectable()
 export class PlayersService {
@@ -16,8 +16,8 @@ export class PlayersService {
         number: createPlayerDto.number,
         team_id: createPlayerDto.team_id ?? null, // Si no tiene equipo, asigna null
         photo: createPlayerDto.photo
-          ? { create: { photo: Buffer.from(createPlayerDto.photo, 'base64') } }
-          : undefined, // Crea la foto si está presente
+          ? { create: createPlayerDto.photo }
+          : undefined,
       },
     });
   }
@@ -32,19 +32,13 @@ export class PlayersService {
   }
 
   async findOne(id: string) {
-    const player = await this.prisma.players.findUnique({
+    return this.prisma.players.findUnique({
       where: { id },
       include: {
-        photo: true, // Incluye la foto si existe
+        photo: true, // Incluye la foto del jugador si existe
         team: true, // Incluye el equipo asociado si existe
       },
     });
-
-    if (!player) {
-      throw new NotFoundException(`Player with ID ${id} not found`);
-    }
-
-    return player;
   }
 
   async update(id: string, updatePlayerDto: UpdatePlayerDto) {
@@ -59,8 +53,8 @@ export class PlayersService {
         photo: updatePlayerDto.photo
           ? {
               upsert: {
-                create: { photo: Buffer.from(updatePlayerDto.photo, 'base64') }, // Si no existe, crea una nueva
-                update: { photo: Buffer.from(updatePlayerDto.photo, 'base64') }, // Si existe, actualiza la foto
+                create: updatePlayerDto.photo,
+                update: updatePlayerDto.photo,
               },
             }
           : undefined, // Si no hay foto, no hacer cambios
@@ -69,12 +63,6 @@ export class PlayersService {
   }
 
   async remove(id: string) {
-    const player = await this.prisma.players.findUnique({ where: { id } });
-
-    if (!player) {
-      throw new NotFoundException(`Player with ID ${id} not found`);
-    }
-
     return this.prisma.players.delete({
       where: { id },
     });

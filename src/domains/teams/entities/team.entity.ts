@@ -1,6 +1,6 @@
 import { teams } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { UserEntity } from 'src/domains/users/entities/user.entity';
 
 export class TeamEntity implements teams {
   @ApiProperty()
@@ -8,9 +8,9 @@ export class TeamEntity implements teams {
   @ApiProperty()
   name: string;
   @ApiProperty({ required: false, nullable: true })
-  photo?: string;
+  photo?: { photo: Buffer; team_id: string } | null;
 
-  @ApiProperty({ required: false, type: [UserEntity] })
+  @ApiProperty({ type: [UserEntity] })
   users?: UserEntity[];
   constructor({ users, ...data }: Partial<TeamEntity>) {
     Object.assign(this, data);
@@ -18,5 +18,5 @@ export class TeamEntity implements teams {
   }
 
   @ApiProperty()
-  players: string[];
+  players?: string[];
 }

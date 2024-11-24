@@ -22,6 +22,7 @@ export class CreatePlayerDto {
   @ApiProperty({ type: Number })
   number: number;
 
-  photo?: string;
+  photo?: { photo: Buffer; player_id: string }; // Foto del jugador, opcional
   team_id?: string; // Clave foránea hacia 'team', opcional
+  team?: { id: string; name: string }; // Equipo asociado, opcional
 }
