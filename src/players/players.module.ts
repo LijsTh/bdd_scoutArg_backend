@@ -3,8 +3,8 @@ import { PlayersService } from './players.service';
 import { PlayersController } from './players.controller';
 import { PrismaModule } from '../database/prisma/prisma.module';
 
-@Module({ 
-  imports : [PrismaModule],
+@Module({
+  imports: [PrismaModule],
   controllers: [PlayersController],
   providers: [PlayersService],
 })

@@ -7,6 +7,13 @@ import { UsersPhotosModule } from './users_photos/users_photos.module';
 import { PlayersPhotosModule } from './players_photos/players_photos.module';
 
 @Module({
-  imports: [UsersModule, PlayersModule, TeamsModule, TeamsPhotosModule, UsersPhotosModule, PlayersPhotosModule],
+  imports: [
+    UsersModule,
+    PlayersModule,
+    TeamsModule,
+    TeamsPhotosModule,
+    UsersPhotosModule,
+    PlayersPhotosModule,
+  ],
 })
 export class AppModule {}

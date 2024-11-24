@@ -110,6 +110,7 @@ $ npx prisma generate
 This will regenerate the Prisma Client based on the current schema.
 
 **Important**: You should run this command:
+
 - When adding, removing, or updating models or fields.
 - When changing relationships between models.
 - When setting up Prisma for the first time in a project.
@@ -126,9 +127,11 @@ $ npx prisma migrate dev --name <migration_name>
 ```
 
 Where:
+
 - **`<migration_name>`**: A descriptive name for the migration, e.g., `add-new-field-to-user`.
 
 This will:
+
 - Create a new migration file under the `prisma/migrations` folder.
 - Apply the migration to the database in development mode.
 
@@ -158,7 +161,7 @@ DIRECT_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-east-
 
 - **`DATABASE_URL`**: This is the primary URL Prisma uses to connect to your PostgreSQL database. It includes the username, password, host, and port.
 - **`DIRECT_URL`**: This is another database connection URL that may be used directly (e.g., for internal or non-connection pooling operations).
-  
+
 **Important**: Replace `[PASSWORD]` with the actual password for your PostgreSQL database.
 
 These environment variables should be kept secure, especially when deploying the application in production.

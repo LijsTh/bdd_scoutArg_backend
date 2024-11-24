@@ -1,10 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TeamsPhotosService } from './teams_photos.service';
 import { CreateTeamsPhotoDto } from './dto/create-teams_photo.dto';
 import { UpdateTeamsPhotoDto } from './dto/update-teams_photo.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamsPhotoEntity } from './entities/teams_photo.entity';
-
 
 @Controller('teams-photos')
 @ApiTags('TeamsPhotos')
@@ -31,7 +38,10 @@ export class TeamsPhotosController {
 
   @Patch(':id')
   @ApiCreatedResponse({ type: TeamsPhotoEntity })
-  update(@Param('id') id: string, @Body() updateTeamsPhotoDto: UpdateTeamsPhotoDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateTeamsPhotoDto: UpdateTeamsPhotoDto,
+  ) {
     return this.teamsPhotosService.update(id, updateTeamsPhotoDto);
   }
 

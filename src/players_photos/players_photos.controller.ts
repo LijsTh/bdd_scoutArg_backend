@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PlayersPhotosService } from './players_photos.service';
 import { CreatePlayersPhotoDto } from './dto/create-players_photo.dto';
 import { UpdatePlayersPhotoDto } from './dto/update-players_photo.dto';
@@ -30,7 +38,10 @@ export class PlayersPhotosController {
 
   @Patch(':id')
   @ApiCreatedResponse({ type: PlayersPhotoEntity })
-  update(@Param('id') id: string, @Body() updatePlayersPhotoDto: UpdatePlayersPhotoDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePlayersPhotoDto: UpdatePlayersPhotoDto,
+  ) {
     return this.playersPhotosService.update(id, updatePlayersPhotoDto);
   }
 

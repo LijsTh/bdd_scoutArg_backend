@@ -11,7 +11,9 @@ export class TeamsService {
     return this.prisma.teams.create({
       data: {
         name: createTeamDto.name,
-        photo: createTeamDto.photo ? { create: { photo: Buffer.from(createTeamDto.photo, 'base64') } } : undefined, // Crea la foto si está presente
+        photo: createTeamDto.photo
+          ? { create: { photo: Buffer.from(createTeamDto.photo, 'base64') } }
+          : undefined, // Crea la foto si está presente
       },
     });
   }
@@ -47,7 +49,7 @@ export class TeamsService {
     return this.prisma.teams.findUnique({
       where: { id: teamId },
       select: {
-        players: true,  // Seleccionamos los jugadores relacionados con el equipo
+        players: true, // Seleccionamos los jugadores relacionados con el equipo
       },
     });
   }

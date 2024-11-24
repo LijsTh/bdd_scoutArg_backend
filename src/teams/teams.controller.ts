@@ -1,11 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamEntity } from './entities/team.entity';
 import { PlayerEntity } from '../players/entities/player.entity';
-
 
 @Controller('teams')
 @ApiTags('Teams')
@@ -16,7 +23,7 @@ export class TeamsController {
   @ApiCreatedResponse({ type: TeamEntity })
   async create(@Body() createTeamDto: CreateTeamDto) {
     return this.teamsService.create(createTeamDto);
-  } 
+  }
 
   @Get()
   @ApiOkResponse({ type: TeamEntity, isArray: true })

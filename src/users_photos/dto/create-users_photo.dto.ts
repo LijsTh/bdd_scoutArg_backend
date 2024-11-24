@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUsersPhotoDto {
-    @ApiProperty()
-    user_id: string;
-    @ApiProperty()
-    photo: string;
+  @ApiProperty()
+  user_id: string;
+  @ApiProperty()
+  photo: string;
 }

@@ -29,4 +29,3 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     }
   }
 }
-

@@ -15,7 +15,9 @@ export class PlayersService {
         position: createPlayerDto.position,
         number: createPlayerDto.number,
         team_id: createPlayerDto.team_id ?? null, // Si no tiene equipo, asigna null
-        photo: createPlayerDto.photo ? { create: { photo: Buffer.from(createPlayerDto.photo, 'base64') } } : undefined, // Crea la foto si está presente
+        photo: createPlayerDto.photo
+          ? { create: { photo: Buffer.from(createPlayerDto.photo, 'base64') } }
+          : undefined, // Crea la foto si está presente
       },
     });
   }

@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTeamsPhotoDto {
-    @ApiProperty()
-    team_id: string;
-    @ApiProperty()
-    photo: string;
+  @ApiProperty()
+  team_id: string;
+  @ApiProperty()
+  photo: string;
 }
