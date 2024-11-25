@@ -12,9 +12,6 @@ export class TeamsService {
     return this.prisma.teams.create({
       data: {
         name: createTeamDto.name,
-        photo: createTeamDto.photo
-          ? { create: createTeamDto.photo }
-          : undefined,
       },
     });
   }
@@ -22,7 +19,6 @@ export class TeamsService {
   async findAll() {
     return this.prisma.teams.findMany({
       include: {
-        photo: true, // Incluye la foto del equipo si existe
         users: true, // Incluye los usuarios asociados
         players: true, // Incluye los jugadores asociados
       },
@@ -33,7 +29,6 @@ export class TeamsService {
     return this.prisma.teams.findUnique({
       where: { id },
       include: {
-        photo: true, // Incluye la foto del equipo si existe
         users: true, // Incluye los usuarios asociados
         players: true, // Incluye los jugadores asociados
       },
@@ -55,14 +50,6 @@ export class TeamsService {
       where: { id },
       data: {
         name: updateTeamDto.name,
-        photo: updateTeamDto.photo
-          ? {
-              upsert: {
-                create: updateTeamDto.photo,
-                update: updateTeamDto.photo,
-              },
-            }
-          : undefined,
         users: updateTeamDto.users
           ? {
               set: updateTeamDto.users.map((userId) => ({ id: userId })),
@@ -75,7 +62,6 @@ export class TeamsService {
           : undefined,
       },
       include: {
-        photo: true,
         users: true,
         players: true,
       },
@@ -86,7 +72,6 @@ export class TeamsService {
     return await this.prisma.teams.delete({
       where: { id },
       include: {
-        photo: true,
         users: true,
         players: true,
       },

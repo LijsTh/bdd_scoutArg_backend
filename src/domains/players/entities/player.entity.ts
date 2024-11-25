@@ -15,7 +15,5 @@ export class PlayerEntity implements players {
   @ApiProperty({ required: false, nullable: true })
   team_id: string | null;
   @ApiProperty({ required: false, nullable: true })
-  photo?: { photo: Buffer; player_id: string } | null;
-  @ApiProperty({ required: false, nullable: true })
   team?: { id: string; name: string } | null;
 }

@@ -14,9 +14,6 @@ export class UsersService {
         name: createUserDto.name,
         password: createUserDto.password,
         team_id: createUserDto.team_id ?? null, // Si no tiene equipo, se asigna null
-        photo: createUserDto.photo
-          ? { create: createUserDto.photo }
-          : undefined,
       },
     });
   }
@@ -25,7 +22,6 @@ export class UsersService {
     return this.prisma.users.findMany({
       include: {
         team: true, // Incluye los detalles del equipo si existe
-        photo: true, // Incluye la foto si existe
       },
     });
   }
@@ -35,7 +31,6 @@ export class UsersService {
       where: { id },
       include: {
         team: true, // Incluye los detalles del equipo si existe
-        photo: true, // Incluye la foto si existe
       },
     });
   }

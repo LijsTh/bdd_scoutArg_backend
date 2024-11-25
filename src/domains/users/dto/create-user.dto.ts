@@ -19,5 +19,4 @@ export class CreateUserDto {
   password: string;
 
   team_id?: string; // Clave foránea, puede ser opcional
-  photo?: { photo: Buffer; user_id: string } | null;
 }

@@ -20,27 +20,13 @@ model users {
   password String
   team_id  String?  // Clave foránea hacia 'teams' (opcional)
   team     teams?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'teams'
-  photo    users_photos?
-}
-
-model users_photos {
-  user_id String @id // Clave foránea hacia 'users'
-  photo   Bytes
-  user    users   @relation(fields: [user_id], references: [id], onDelete: Cascade) // Relación con 'users'
 }
 
 model teams {
   id       String   @id @default(cuid())
   name     String
-  photo    teams_photos?
   users    users[]
   players  players[]
-}
-
-model teams_photos {
-  team_id String @id // Clave foránea hacia 'teams'
-  photo   Bytes
-  team    teams   @relation(fields: [team_id], references: [id], onDelete: Cascade) // Relación con 'teams'
 }
 
 model players {
@@ -50,12 +36,5 @@ model players {
   position  String
   number    Int
   team_id   String?  // Clave foránea hacia 'teams' (opcional)
-  photo     players_photos? // Relación con 'players_photos' 
   team      teams?    @relation(fields: [team_id], references: [id], onDelete: SetNull) // Relación con 'teams'
-}
-
-model players_photos {
-  player_id String @id // Clave foránea hacia 'player'
-  photo     Bytes
-  player    players @relation(fields: [player_id], references: [id], onDelete: Cascade) // Relación con 'player'
 }
