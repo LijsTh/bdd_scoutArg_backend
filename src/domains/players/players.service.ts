@@ -15,9 +15,6 @@ export class PlayersService {
         position: createPlayerDto.position,
         number: createPlayerDto.number,
         team_id: createPlayerDto.team_id ?? null, // Si no tiene equipo, asigna null
-        photo: createPlayerDto.photo
-          ? { create: createPlayerDto.photo }
-          : undefined,
       },
     });
   }
@@ -25,7 +22,6 @@ export class PlayersService {
   async findAll() {
     return this.prisma.players.findMany({
       include: {
-        photo: true, // Incluye la foto del jugador si existe
         team: true, // Incluye el equipo asociado si existe
       },
     });
@@ -35,7 +31,6 @@ export class PlayersService {
     return this.prisma.players.findUnique({
       where: { id },
       include: {
-        photo: true, // Incluye la foto del jugador si existe
         team: true, // Incluye el equipo asociado si existe
       },
     });
@@ -50,14 +45,6 @@ export class PlayersService {
         position: updatePlayerDto.position,
         number: updatePlayerDto.number,
         team_id: updatePlayerDto.team_id ?? null, // Si no tiene equipo, asigna null
-        photo: updatePlayerDto.photo
-          ? {
-              upsert: {
-                create: updatePlayerDto.photo,
-                update: updatePlayerDto.photo,
-              },
-            }
-          : undefined, // Si no hay foto, no hacer cambios
       },
     });
   }
