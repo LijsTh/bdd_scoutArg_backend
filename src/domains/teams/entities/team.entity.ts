@@ -3,20 +3,18 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from 'src/domains/users/entities/user.entity';
 
 export class TeamEntity implements teams {
-  @ApiProperty()
-  id: string;
-  @ApiProperty()
-  name: string;
-  @ApiProperty({ required: false, nullable: true })
-  photo?: { photo: Buffer; team_id: string } | null;
+    @ApiProperty({example: 'team123', description: 'Team ID'})
+    id: string;
+    @ApiProperty({example: 'Team name', description: 'Team name'})
+    name: string;
 
-  @ApiProperty({ type: [UserEntity] })
-  users?: UserEntity[];
-  constructor({ users, ...data }: Partial<TeamEntity>) {
-    Object.assign(this, data);
-    this.users = users ? users.map((user) => new UserEntity(user)) : [];
-  }
+    @ApiProperty({ type: [UserEntity], description: 'Team users' })
+    users?: UserEntity[];
+    constructor({ users, ...data }: Partial<TeamEntity>) {
+        Object.assign(this, data);
+        this.users = users ? users.map((user) => new UserEntity(user)) : [];
+    }
 
-  @ApiProperty()
-  players?: string[];
+    @ApiProperty({example: ['player123', 'player456'], description: 'Team players' })
+    players?: string[];
 }

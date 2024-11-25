@@ -4,8 +4,8 @@ import { TeamsController } from './teams.controller';
 import { PrismaModule } from '../../database/prisma/prisma.module';
 
 @Module({
-  imports: [PrismaModule],
-  controllers: [TeamsController],
-  providers: [TeamsService],
+    imports: [PrismaModule],
+    controllers: [TeamsController],
+    providers: [TeamsService],
 })
 export class TeamsModule {}

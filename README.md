@@ -30,8 +30,8 @@ Sure! Here's an extended and professional version of the `README.md` file with d
 
 Before starting with the project, ensure that you have the necessary tools installed:
 
-- **Node.js**: This project requires Node.js, which you can install from the official website: [https://nodejs.org/](https://nodejs.org/).
-- **npm**: npm (Node Package Manager) is installed alongside Node.js. If you don't have the latest version of npm, you can update it using the following command:
+-   **Node.js**: This project requires Node.js, which you can install from the official website: [https://nodejs.org/](https://nodejs.org/).
+-   **npm**: npm (Node Package Manager) is installed alongside Node.js. If you don't have the latest version of npm, you can update it using the following command:
 
 ```bash
 $ npm install -g npm@latest
@@ -46,11 +46,11 @@ Once you have the necessary tools installed, you can begin by setting up the pro
 1. **Install project dependencies**:
    After cloning or downloading the project repository, navigate to the project directory and run:
 
-   ```bash
-   $ npm install
-   ```
+    ```bash
+    $ npm install
+    ```
 
-   This will install all the required dependencies defined in the `package.json` file.
+    This will install all the required dependencies defined in the `package.json` file.
 
 2. **Environment Configuration**:
    The project may require configuration of environment variables to connect to services like databases. These should be defined in a `.env` file located in the `src` directory.
@@ -111,10 +111,10 @@ This will regenerate the Prisma Client based on the current schema.
 
 **Important**: You should run this command:
 
-- When adding, removing, or updating models or fields.
-- When changing relationships between models.
-- When setting up Prisma for the first time in a project.
-- If you update the `@prisma/client` package, you need to regenerate the client to ensure compatibility with the new version.
+-   When adding, removing, or updating models or fields.
+-   When changing relationships between models.
+-   When setting up Prisma for the first time in a project.
+-   If you update the `@prisma/client` package, you need to regenerate the client to ensure compatibility with the new version.
 
 ### 2. **Running Migrations**
 
@@ -128,12 +128,12 @@ $ npx prisma migrate dev --name <migration_name>
 
 Where:
 
-- **`<migration_name>`**: A descriptive name for the migration, e.g., `add-new-field-to-user`.
+-   **`<migration_name>`**: A descriptive name for the migration, e.g., `add-new-field-to-user`.
 
 This will:
 
-- Create a new migration file under the `prisma/migrations` folder.
-- Apply the migration to the database in development mode.
+-   Create a new migration file under the `prisma/migrations` folder.
+-   Apply the migration to the database in development mode.
 
 In production, you'll use the following command to deploy the migrations without generating new migration files:
 
@@ -159,8 +159,8 @@ DATABASE_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-eas
 DIRECT_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-east-1.pooler.supabase.com:5432/postgres"
 ```
 
-- **`DATABASE_URL`**: This is the primary URL Prisma uses to connect to your PostgreSQL database. It includes the username, password, host, and port.
-- **`DIRECT_URL`**: This is another database connection URL that may be used directly (e.g., for internal or non-connection pooling operations).
+-   **`DATABASE_URL`**: This is the primary URL Prisma uses to connect to your PostgreSQL database. It includes the username, password, host, and port.
+-   **`DIRECT_URL`**: This is another database connection URL that may be used directly (e.g., for internal or non-connection pooling operations).
 
 **Important**: Replace `[PASSWORD]` with the actual password for your PostgreSQL database.
 
