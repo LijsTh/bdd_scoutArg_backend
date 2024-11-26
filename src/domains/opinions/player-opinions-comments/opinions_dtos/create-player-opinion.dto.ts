@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt, IsNotEmpty, Max, Min, isDate } from 'class-validator';
+import { IsString, IsInt, IsNotEmpty, Max, Min } from 'class-validator';
 
 export class CreatePlayerOpinionDto {
     @ApiProperty({ example: 'user123', description: 'User ID' })
