@@ -24,7 +24,7 @@ model users {
 
 model teams {
   id       String   @id @default(cuid())
-  name     String
+  name     String  @unique
   users    users[]
   players  players[]
 }
