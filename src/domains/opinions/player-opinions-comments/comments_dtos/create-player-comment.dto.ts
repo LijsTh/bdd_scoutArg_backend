@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsDate } from 'class-validator';
 
 export class CreatePlayerCommentDto {
     @ApiProperty({ example: 'user123', description: 'User ID' })
@@ -25,6 +25,6 @@ export class CreatePlayerCommentDto {
         description: 'Creation date',
     })
     @IsNotEmpty({ message: 'Creation date is required.' })
-    @IsString({ message: 'Creation date must be a string.' })
+    @IsDate({ message: 'Creation date must be date.' })
     created_at: string;
 }

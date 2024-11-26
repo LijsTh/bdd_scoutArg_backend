@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt, IsNotEmpty, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsInt, IsNotEmpty, Max, Min, IsDate } from 'class-validator';
 
 export class CreatePlayerOpinionDto {
     @ApiProperty({ example: 'user123', description: 'User ID' })
@@ -32,6 +33,7 @@ export class CreatePlayerOpinionDto {
         description: 'Creation date',
     })
     @IsNotEmpty({ message: 'Creation date is required.' })
-    @IsString({ message: 'Creation date must be a string.' })
-    created_at: string;
+    @IsDate({ message: 'Creation date must be date.' })
+    @Type(() => Date)
+    created_at: Date;
 }

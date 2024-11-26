@@ -107,7 +107,9 @@ export class PrismaErrorFormatter {
             }
             case 'P2025': {
                 const cause = this.exception.meta?.cause || 'record not found';
-                return `An operation failed because it depends on required records that were not found. ${cause}`;
+                const model_name = this.exception.meta?.modelName || 'unknown model';
+                console.log(this.exception.meta);
+                return `Record: ${model_name} not found. ${cause}`;
             }
             case 'P2026': {
                 const feature = this.exception.meta?.feature || 'unsupported feature';

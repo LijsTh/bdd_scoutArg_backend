@@ -18,5 +18,7 @@ export class CreateUserDto {
     @ApiProperty({ type: String, minLength: 8, example: 'password' })
     password: string;
 
+    @ApiProperty({ type: String, example: 'team123', description: 'Team ID' })
+    @IsString({ message: 'Team ID must be a string.' })
     team_id?: string; // Clave foránea, puede ser opcional
 }
