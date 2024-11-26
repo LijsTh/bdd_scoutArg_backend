@@ -1,19 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class TeamOpinion {
+export class PlayerOpinionEntity {
     @ApiProperty({ example: 'user123', description: 'User ID' })
     user_id: string;
 
-    @ApiProperty({ example: 'team123', description: 'Team ID' })
-    team_id: string;
+    @ApiProperty({ example: 'player123', description: 'Player ID' })
+    player_id: string;
 
     @ApiProperty({
-        example: 'Team with great defense.',
+        example: 'Player with great technique.',
         description: 'Opinion text',
     })
     opinion_text: string;
 
-    @ApiProperty({ example: 5, description: 'Team rating (1-5 stars)' })
+    @ApiProperty({ example: 5, description: 'Player rating (1-5 stars)' })
     rating: number;
 
     @ApiProperty({
