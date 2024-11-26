@@ -13,7 +13,7 @@ export class CreatePlayerCommentDto {
     })
     @IsString()
     @IsNotEmpty()
-    opinion_team_id: string;
+    player_opinion_id: string;
 
     @ApiProperty({ example: 'Totally agree.', description: 'Comment text' })
     @IsString()
@@ -24,5 +24,7 @@ export class CreatePlayerCommentDto {
         example: '2023-11-25T12:34:56.789Z',
         description: 'Creation date',
     })
+    @IsString()
+    @IsNotEmpty()
     created_at: string;
 }
