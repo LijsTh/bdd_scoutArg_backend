@@ -83,7 +83,11 @@ export class TeamsController {
     @ApiCreatedResponse({ type: TeamEntity })
     async update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto): Promise<TeamEntity> {
         if ('users' in updateTeamDto || 'players' in updateTeamDto) {
-            throw RequestErrorBuilder.throwFormattedPatchBodyError('Team', `/teams/${id}`, 'Cannot update users or players. Only the name field can be updated.');
+            throw RequestErrorBuilder.throwFormattedPatchBodyError(
+                'Team',
+                `/teams/${id}`,
+                'Cannot update users or players. Only the name field can be updated.',
+            );
         }
         const team = await this.teamsService.update(id, updateTeamDto);
         if (!team) {
