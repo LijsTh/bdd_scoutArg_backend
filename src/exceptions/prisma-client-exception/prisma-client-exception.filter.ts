@@ -7,7 +7,6 @@ import { PrismaErrorFormatter } from './prisma-error-formatter.filter';
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
-        console.error(exception.message);
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest();
@@ -20,6 +19,10 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 
         // Determina el estado HTTP basado en el código de error
         const status = this.getHttpStatus(exception.code);
+
+        if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+            console.error(exception);
+        }
 
         response.status(status).json({
             title: title,
