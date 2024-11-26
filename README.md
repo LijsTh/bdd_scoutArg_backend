@@ -1,144 +1,174 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Football Website Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> Server-side backend for database management university project.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-
-Sure! Here's an extended and professional version of the `README.md` file with detailed explanations for each section:
+This repository contains the back-end infrastructure for a football-focused website, built using **Node.js**, **NestJS**, **PostgreSQL**, **Firebase**, and **Prisma**. The back-end handles user data, real-time updates, and dynamic content, designed for high availability, performance, and scalability.
 
 ---
 
-# Project Setup and Execution
+## Table of Contents
+
+1. [Repository Structure](#repository-structure)
+2. [Prerequisites](#prerequisites)
+3. [Project Setup](#project-setup)
+    - 3.1. [Install Project Dependencies](#install-project-dependencies)
+    - 3.2. [Configure Environment Variables](#configure-environment-variables)
+4. [Compile and Run the Project](#compile-and-run-the-project)
+    - 4.1. [Development Mode](#development-mode)
+    - 4.2. [Watch Mode](#watch-mode)
+    - 4.3. [Production Mode](#production-mode)
+5. [Prisma Considerations](#prisma-considerations)
+    - 5.1. [Generate Prisma Client](#generate-prisma-client)
+    - 5.2. [Running Migrations](#running-migrations)
+6. [ENV Configuration](#env-configuration)
+7. [Contributing](#contributing)
+8. [License](#license)
+
+---
+
+## Repository Structure
+
+```plaintext
+├── src/                  # Application source code
+│   ├── app.module.ts     # Main application module
+│   ├── main.ts           # Application entry point
+│   ├── database/         # Database-related files
+│   │   ├── firebase/     # Firebase configuration and utilities
+│   │   ├── prisma/       # Prisma ORM configuration and migrations
+│   │   └── scripts/      # Database or project-related scripts
+│   ├── domains/          # Business logic related to entities (e.g., players, teams)
+│   │   ├── opinions/     # Opinions module
+│   │   ├── players/      # Players module
+│   │   ├── teams/        # Teams module
+│   │   └── users/        # Users module
+│   └── utils/            # Utility functions and helpers
+├── .gitignore            # Git ignore file
+├── LICENSE               # Project license
+├── README.md             # Project documentation
+├── package.json          # Project dependencies and scripts
+├── serviceAccountKey.json # Firebase service account key (required)
+├── tsconfig.json         # TypeScript configuration
+├── tsconfig.build.json   # TypeScript build configuration
+├── nest-cli.json         # NestJS CLI configuration
+├── .env                  # Environment variables for configuration
+├── .eslintrc.js          # ESLint configuration
+└── .prettierrc           # Prettier configuration
+```
+
+---
 
 ## Prerequisites
 
-Before starting with the project, ensure that you have the necessary tools installed:
+Before starting with the project, ensure that you have the following tools installed:
 
--   **Node.js**: This project requires Node.js, which you can install from the official website: [https://nodejs.org/](https://nodejs.org/).
--   **npm**: npm (Node Package Manager) is installed alongside Node.js. If you don't have the latest version of npm, you can update it using the following command:
+-   **Node.js**: Install from [https://nodejs.org/](https://nodejs.org/)
+-   **npm**: Install or update to the latest version of npm by running the following command:
 
 ```bash
 $ npm install -g npm@latest
 ```
 
-This will install the latest version of npm globally.
-
 ## Project Setup
 
-Once you have the necessary tools installed, you can begin by setting up the project:
+### 1. Install project dependencies
 
-1. **Install project dependencies**:
-   After cloning or downloading the project repository, navigate to the project directory and run:
+After cloning or downloading the repository, navigate to the project directory and install the dependencies by running:
 
-    ```bash
-    $ npm install
-    ```
+```bash
+$ npm install
+```
 
-    This will install all the required dependencies defined in the `package.json` file.
+### 2. Configure environment variables
 
-2. **Environment Configuration**:
-   The project may require configuration of environment variables to connect to services like databases. These should be defined in a `.env` file located in the `src` directory.
+Create a `.env` file in the `src` directory and configure the necessary environment variables for the database and Firebase connection.
+
+Example configuration:
+
+```bash
+# ./src/.env
+
+## DATABASE ENVS FOR PRISMA
+DATABASE_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-east-1.pooler.supabase.com:5432/postgres"
+
+## DATABASE ENVS FOR FIREBASE
+GOOGLE_APPLICATION_CREDENTIALS="path_to_serviceAccountKey.json"
+```
+
+> **Important**: Replace `[PASSWORD]` with the actual PostgreSQL password and set the correct path for the **serviceAccountKey.json** file. The `serviceAccountKey.json` should be placed in the **root** of your project.
 
 ---
 
 ## Compile and Run the Project
 
-There are multiple ways to run the project depending on the environment you're working in. Here are the commands to compile and run the project:
-
 ### Development Mode
 
-To start the project in development mode, where it will automatically reload when code changes are detected, run:
+To start the project in development mode, where it automatically reloads on code changes, run:
 
 ```bash
 $ npm run start
 ```
 
-This will run the project using the development configurations.
-
 ### Watch Mode
 
-To start the project in watch mode, which keeps the application running and restarts it automatically when any files are modified, run:
+To start the project in watch mode, which restarts the application on file changes, run:
 
 ```bash
 $ npm run start:dev
 ```
 
-This mode is useful during active development as it eliminates the need to manually restart the server after each change.
-
 ### Production Mode
 
-To start the project in production mode, use the following command:
+To start the project in production mode, use:
 
 ```bash
 $ npm run start:prod
 ```
 
-This mode runs the application in a more optimized way for production environments, typically with minified code and performance enhancements.
-
 ---
 
 ## Prisma Considerations
 
-Prisma is an ORM (Object-Relational Mapping) tool that facilitates communication between your application and the database. The following commands are related to Prisma and its integration into the project.
+Prisma is an ORM (Object-Relational Mapping) tool that facilitates communication between your application and the database. Below are the commands related to Prisma and its integration into the project.
 
 ### 1. **Generate Prisma Client**
 
-Whenever you make changes to the Prisma schema (located in `prisma/schema.prisma`), such as adding, removing, or updating models, fields, or relationships between models, you need to regenerate the Prisma Client to ensure that the client is in sync with the schema.
+Whenever you make changes to the Prisma schema (located in `./src/database/prisma/schema.prisma`), such as adding, removing, or updating models, fields, or relationships between models, you need to regenerate the Prisma Client to ensure that the client is in sync with the schema.
 
 To generate the Prisma Client, run the following command:
 
 ```bash
-$ npx prisma generate
+$ npx prisma generate --schema ./src/database/prisma/schema.prisma
 ```
 
-This will regenerate the Prisma Client based on the current schema.
+**Important**: Run this command when:
 
-**Important**: You should run this command:
-
--   When adding, removing, or updating models or fields.
--   When changing relationships between models.
--   When setting up Prisma for the first time in a project.
--   If you update the `@prisma/client` package, you need to regenerate the client to ensure compatibility with the new version.
+-   Adding, removing, or updating models or fields.
+-   Changing relationships between models.
+-   Setting up Prisma for the first time in a project.
+-   Updating the `@prisma/client` package to ensure compatibility with the new version.
 
 ### 2. **Running Migrations**
 
-Prisma uses migrations to manage changes to the database schema over time. When you modify the Prisma schema (e.g., adding a new model or changing a model's structure), you'll need to create and apply a migration to reflect those changes in the database.
+Prisma uses migrations to manage changes to the database schema over time. When you modify the Prisma schema (e.g., adding a new model or changing a model's structure), you’ll need to create and apply a migration to reflect those changes in the database.
 
 To create a new migration and apply it to your development database, run:
 
 ```bash
-$ npx prisma migrate dev --name <migration_name>
+$ npx prisma migrate dev --name <migration_name> --schema ./src/database/prisma/schema.prisma
 ```
 
 Where:
 
--   **`<migration_name>`**: A descriptive name for the migration, e.g., `add-new-field-to-user`.
+-   **`<migration_name>`**: A descriptive name for the migration (e.g., `add-new-field-to-user`).
 
 This will:
 
 -   Create a new migration file under the `prisma/migrations` folder.
 -   Apply the migration to the database in development mode.
 
-In production, you'll use the following command to deploy the migrations without generating new migration files:
+In production, you can deploy the migrations without generating new migration files by using the following command:
 
 ```bash
-$ npx prisma migrate deploy
+$ npx prisma migrate deploy --schema ./src/database/prisma/schema.prisma
 ```
 
 This command applies any unapplied migrations to the production database.
@@ -147,21 +177,18 @@ This command applies any unapplied migrations to the production database.
 
 ## ENV Configuration
 
-The project requires database credentials for Prisma to connect to your database. These credentials are defined in the `.env` file located in the `src` directory.
+Make sure your `.env` file is properly configured to connect both the PostgreSQL database and Firebase. The file should contain the necessary connection URLs and service account credentials.
 
-Here’s an example of how to configure the `.env` file for connecting to a PostgreSQL database:
+---
 
-```bash
-# ./src/.env
+## Contributing
 
-## DATABASE ENVS FOR PRISMA
-DATABASE_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
-DIRECT_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-east-1.pooler.supabase.com:5432/postgres"
-```
+Feel free to fork the repository and submit a pull request. Please follow the project coding standards and ensure that all tests pass before submitting your changes.
 
--   **`DATABASE_URL`**: This is the primary URL Prisma uses to connect to your PostgreSQL database. It includes the username, password, host, and port.
--   **`DIRECT_URL`**: This is another database connection URL that may be used directly (e.g., for internal or non-connection pooling operations).
+---
 
-**Important**: Replace `[PASSWORD]` with the actual password for your PostgreSQL database.
+## License
 
-These environment variables should be kept secure, especially when deploying the application in production.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
