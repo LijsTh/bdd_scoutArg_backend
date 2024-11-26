@@ -2,23 +2,23 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreatePlayerDto {
-    @IsString({ message: 'Name must be a string.' })
     @IsNotEmpty({ message: 'Name is required.' })
+    @IsString({ message: 'Name must be a string.' })
     @ApiProperty({ type: String, example: 'John Doe', description: 'Player name' })
     name: string;
 
-    @IsNumber({}, { message: 'Age must be a number.' })
     @IsNotEmpty({ message: 'Age is required.' })
+    @IsNumber({}, { message: 'Age must be a number.' })
     @ApiProperty({ type: Number, example: 25, description: 'Player age' })
     age: number;
 
-    @IsString({ message: 'Position must be a string.' })
     @IsNotEmpty({ message: 'Position is required.' })
+    @IsString({ message: 'Position must be a string.' })
     @ApiProperty({ type: String, example: 'Forward', description: 'Player position' })
     position: string;
 
-    @IsNumber({}, { message: 'Shirt number must be a number.' })
     @IsNotEmpty({ message: 'Shirt number is required.' })
+    @IsNumber({}, { message: 'Shirt number must be a number.' })
     @ApiProperty({ type: Number, example: 10, description: 'Player number' })
     number: number;
 
