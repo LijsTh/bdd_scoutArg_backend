@@ -6,7 +6,7 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamEntity } from './entities/team.entity';
 import { PlayerEntity } from '../players/entities/player.entity';
 import { UserEntity } from '../users/entities/user.entity';
-import { RequestErrorBuilder } from 'src/exceptions/http-exception/request-error-builder';
+import { RequestErrorBuilder } from 'src/utils/exceptions/http-exception/request-error-builder';
 
 @Controller('teams')
 @ApiTags('Teams')

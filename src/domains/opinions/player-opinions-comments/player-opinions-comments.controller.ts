@@ -5,7 +5,7 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PlayerOpinionEntity } from './opinions_entity/player-opinion.entity';
 import { CreatePlayerCommentDto } from './comments_dtos/create-player-comment.dto';
 import { PlayerCommentEntity } from './comments_entity/player-comment.entity';
-import { RequestErrorBuilder } from '../../../exceptions/http-exception/request-error-builder';
+import { RequestErrorBuilder } from '../../../utils/exceptions/http-exception/request-error-builder';
 
 @Controller('player-opinions')
 @ApiTags('Player Opinions Comments')

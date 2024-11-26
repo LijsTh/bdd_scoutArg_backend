@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import { ValidationError } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpAdapterHost } from '@nestjs/core';
-import { PrismaClientExceptionFilter } from './exceptions/prisma-client-exception/prisma-client-exception.filter';
+import { PrismaClientExceptionFilter } from './utils/exceptions/prisma-client-exception/prisma-client-exception.filter';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 

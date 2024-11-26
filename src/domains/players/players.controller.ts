@@ -4,7 +4,7 @@ import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PlayerEntity } from './entities/player.entity';
-import { RequestErrorBuilder } from 'src/exceptions/http-exception/request-error-builder';
+import { RequestErrorBuilder } from 'src/utils/exceptions/http-exception/request-error-builder';
 
 @Controller('players')
 @ApiTags('Players')

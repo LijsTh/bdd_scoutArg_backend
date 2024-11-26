@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { RequestErrorBuilder } from '../../exceptions/http-exception/request-error-builder';
+import { RequestErrorBuilder } from '../../utils/exceptions/http-exception/request-error-builder';
 
 @Controller('users')
 @ApiTags('Users')
