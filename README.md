@@ -66,6 +66,8 @@ Before starting with the project, ensure that you have the following tools insta
 $ npm install -g npm@latest
 ```
 
+---
+
 ## Project Setup
 
 ### 1. Install project dependencies
