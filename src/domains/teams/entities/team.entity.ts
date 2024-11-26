@@ -1,6 +1,7 @@
 import { teams } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from 'src/domains/users/entities/user.entity';
+import { PlayerEntity } from 'src/domains/players/entities/player.entity';
 
 export class TeamEntity implements teams {
     @ApiProperty({ example: 'team123', description: 'Team ID' })
@@ -15,6 +16,6 @@ export class TeamEntity implements teams {
         this.users = users ? users.map((user) => new UserEntity(user)) : [];
     }
 
-    @ApiProperty({ example: ['player123', 'player456'], description: 'Team players' })
+    @ApiProperty({ type: [PlayerEntity], description: 'Team players' })
     players?: string[];
 }

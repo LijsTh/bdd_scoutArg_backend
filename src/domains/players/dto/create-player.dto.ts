@@ -24,5 +24,4 @@ export class CreatePlayerDto {
 
     @ApiProperty({ required: false, nullable: true, example: 'team123', description: 'Team ID' })
     team_id?: string; // Clave foránea hacia 'team', opcional
-    team?: { id: string; name: string }; // Equipo asociado, opcional
 }

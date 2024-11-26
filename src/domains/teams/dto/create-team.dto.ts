@@ -7,8 +7,4 @@ export class CreateTeamDto {
     @MinLength(3, { message: 'Name must be at least 3 characters.' })
     @ApiProperty({ type: String, minLength: 3, example: 'Team name' })
     name: string;
-    @ApiProperty({ type: [String], description: 'Team users' })
-    users: string[];
-    @ApiProperty({ type: [String], description: 'Team players' })
-    players: string[];
 }

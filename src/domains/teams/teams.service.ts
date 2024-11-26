@@ -55,21 +55,7 @@ export class TeamsService {
                 id,
             },
             data: {
-                name: updateTeamDto.name,
-                users: updateTeamDto.users
-                    ? {
-                          set: updateTeamDto.users.map((userId) => ({
-                              id: userId,
-                          })),
-                      }
-                    : undefined,
-                players: updateTeamDto.players
-                    ? {
-                          set: updateTeamDto.players.map((playerId) => ({
-                              id: playerId,
-                          })),
-                      }
-                    : undefined,
+                name: updateTeamDto.name, // Only update the name
             },
             include: {
                 users: true,

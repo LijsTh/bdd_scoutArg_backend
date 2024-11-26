@@ -29,6 +29,15 @@ export class RequestErrorBuilder {
         );
     }
 
+    static throwFormattedPatchBodyError(domain: string, instance: string, badRequestMessage?: string) {
+        return new FormattedException(
+            'Invalid request body',
+            HttpStatus.BAD_REQUEST,
+            badRequestMessage || `Error updating ${domain.toLowerCase()}.`,
+            instance,
+        );
+    }
+
     static throwFormattedDeleteError(domain: string, instance: string, id: string) {
         return new FormattedException(
             'Record not found',
