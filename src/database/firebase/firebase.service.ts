@@ -11,7 +11,7 @@ export class FirebaseService implements OnModuleInit {
 
     async onModuleInit() {
         try {
-            const firebaseApp = initializeApp({
+            initializeApp({
                 credential: applicationDefault(),
             });
 

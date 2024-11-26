@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ValidationError } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -7,31 +7,26 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { PrismaClientExceptionFilter } from './utils/exceptions/prisma-client-exception/prisma-client-exception.filter';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { ValidationErr, FormattedExceptionWithValidation } from './utils/exceptions/http-exception/formatted-exeption';
 
 export function validationExceptionFactory(errors: ValidationError[]) {
-    const formattedErrors = errors.reduce(
-        (
-            acc: {
-                [key: string]: string[];
-            },
-            err,
-        ) => {
-            const field = err.property;
-            const constraints = err.constraints || {
-                unknown: 'Unknown error',
-            };
+    const parsedErrors: ValidationErr[] = [];
 
-            acc[field] = Object.values(constraints);
+    for (const error of errors) {
+        const property: string = error.property;
+        const constraints = error.constraints;
+        if (constraints) {
+            parsedErrors.push(new ValidationErr(property, Object.values(constraints)[0]));
+        }
+    }
 
-            return acc;
-        },
-        {} as { [key: string]: string[] },
+    throw new FormattedExceptionWithValidation(
+        'Validation Error',
+        400,
+        'Validation failed for the request',
+        'https://tools.ietf.org/html/rfc7231#section-6.5.1',
+        parsedErrors,
     );
-
-    throw new BadRequestException({
-        message: 'Validation failed',
-        errors: formattedErrors, // Attach the formatted errors to the response
-    });
 }
 
 async function bootstrap() {

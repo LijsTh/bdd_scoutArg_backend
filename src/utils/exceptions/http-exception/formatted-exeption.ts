@@ -13,3 +13,33 @@ export class FormattedException extends HttpException {
         );
     }
 }
+
+export class ValidationErr {
+    field: string;
+    reason: string;
+    constructor(field: string, reason: string) {
+        this.field = field;
+        this.reason = reason;
+    }
+}
+
+export class FormattedExceptionWithValidation extends HttpException {
+    constructor(
+        title: string,
+        status: HttpStatus,
+        detail: string,
+        instance: string,
+        validationsErrors: ValidationErr[],
+    ) {
+        super(
+            {
+                title,
+                status,
+                detail,
+                instance,
+                validationsErrors,
+            },
+            status,
+        );
+    }
+}
