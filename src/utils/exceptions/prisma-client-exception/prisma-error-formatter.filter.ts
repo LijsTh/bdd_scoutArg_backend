@@ -15,7 +15,7 @@ export class PrismaErrorFormatter {
             }
             case 'P2002': {
                 const constraint = this.exception.meta?.target || 'constraint';
-                return `Unique constraint failed on ${constraint}.`;
+                return `This ${constraint} already exists.`;
             }
             case 'P2003': {
                 const field_name = this.exception.meta?.field_name || 'unknown field';
