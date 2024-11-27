@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LogInDto, LogInResponseDto } from './dto/login.dto';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { createFormattedError } from '../../utils/exceptions/http-exception/formatted-exeption';
@@ -72,6 +73,18 @@ export class UsersController {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+
+    @Post('login')
+    @ApiOkResponse({ type: LogInResponseDto })
+    async login(@Body() loginDto: LogInDto): Promise<LogInResponseDto> {
+        try {
+            const userData = await this.usersService.logIn(loginDto);
+            return userData;
+        } catch (error) {
+            // Falta manejar el error de autenticación
+            throw createFormattedError('Error logging in', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 }

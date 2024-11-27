@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LogInDto, LogInResponseDto } from './dto/login.dto';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PasswordService } from 'src/utils/passwords/password.service';
 import { UserEntity } from './entities/user.entity';
-import e from 'express';
+import { JwtPayload, generateToken } from 'src/utils/auth/auth';
 
 @Injectable()
 export class UsersService {
@@ -79,5 +80,28 @@ export class UsersService {
             throw new NotFoundException(`User with id ${id} not found`);
         }
         return new UserEntity(userDeleted);
+    }
+
+    async logIn(loginDto: LogInDto): Promise<LogInResponseDto> {
+        const user = await this.prisma.users.findUnique({
+            where: {
+                email: loginDto.email,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        const passwordMatch = await this.passwordService.comparePasswords(loginDto.password, user.password);
+        if (!passwordMatch) {
+            throw new NotFoundException('Invalid password');
+        }
+
+        const payload: JwtPayload = { user: user.id };
+        const token = generateToken(payload);
+
+        return {
+            ...user,
+            token,
+        };
     }
 }
