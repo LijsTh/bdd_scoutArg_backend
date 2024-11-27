@@ -16,12 +16,12 @@ export class TeamOpinionsCommentsModule {
         consumer
             .apply(ValidateLoginMiddleware)
             .forRoutes(
-                { path: '/players/opinions', method: RequestMethod.POST },
-                { path: '/players/opinions/*', method: RequestMethod.PATCH },
-                { path: '/players/opinions/*', method: RequestMethod.DELETE },
-                { path: '/players/opinions/*/comments', method: RequestMethod.POST },
-                { path: '/players/opinions/*/comments/*', method: RequestMethod.PATCH },
-                { path: '/players/opinions/*/comments/*', method: RequestMethod.DELETE },
+                { path: '/team/opinions', method: RequestMethod.POST },
+                { path: '/team/opinions/*', method: RequestMethod.PATCH },
+                { path: '/team/opinions/*', method: RequestMethod.DELETE },
+                { path: '/team/opinions/*/comments', method: RequestMethod.POST },
+                { path: '/team/opinions/*/comments/*', method: RequestMethod.PATCH },
+                { path: '/team/opinions/*/comments/*', method: RequestMethod.DELETE },
             );
     }
 }

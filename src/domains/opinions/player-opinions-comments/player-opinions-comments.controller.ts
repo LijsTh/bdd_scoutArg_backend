@@ -22,7 +22,7 @@ import { CreatePlayerCommentDto } from './comments_dtos/create-player-comment.dt
 import { PlayerCommentEntity } from './comments_entity/player-comment.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 
-@Controller('players')
+@Controller('player')
 @ApiTags('Player Opinions Comments')
 export class PlayerOpinionsCommentsController {
     constructor(private readonly service: PlayerOpinionsCommentsService) {}

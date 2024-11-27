@@ -21,7 +21,7 @@ import { CreateTeamCommentDto } from './comments_dtos/create-team-comment.dto';
 import { TeamCommentEntity } from './comments_entity/team-comment.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 
-@Controller('teams')
+@Controller('team')
 @ApiTags('Team Opinions Comments')
 export class TeamOpinionsCommentsController {
     constructor(private readonly service: TeamOpinionsCommentsService) {}
