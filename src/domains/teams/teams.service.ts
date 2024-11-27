@@ -3,76 +3,117 @@ import { TeamEntity } from './entities/team.entity';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { UserEntity } from '../users/entities/user.entity';
+import { PlayerEntity } from '../players/entities/player.entity';
 
 @Injectable()
 export class TeamsService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async create(createTeamDto: CreateTeamDto) {
-        return this.prisma.teams.create({
-            data: {
-                name: createTeamDto.name,
-            },
-        });
-    }
-
-    async findAll() {
-        return this.prisma.teams.findMany({
+    async create(createTeamDto: CreateTeamDto): Promise<TeamEntity> {
+        const team = await this.prisma.teams.create({
+            data: createTeamDto,
             include: {
-                users: true, // Incluye los usuarios asociados
-                players: true, // Incluye los jugadores asociados
+                users: true,
+                players: true,
             },
+        });
+        return new TeamEntity({
+            ...team,
+            players: team.players ? team.players.map((player) => player.id) : [],
         });
     }
 
-    async findOne(id: string) {
-        return this.prisma.teams.findUnique({
+    async findAll(): Promise<TeamEntity[]> {
+        const teams = await this.prisma.teams.findMany({
+            include: {
+                users: true,
+                players: true,
+            },
+        });
+        return teams.map(
+            (team) =>
+                new TeamEntity({
+                    ...team,
+                    users: team.users ? team.users.map((user) => new UserEntity(user)) : [],
+                    players: team.players ? team.players.map((player) => player.id) : [],
+                }),
+        );
+    }
+
+    async findOne(id: string): Promise<TeamEntity> {
+        const team = await this.prisma.teams.findUnique({
             where: {
                 id,
             },
             include: {
-                users: true, // Incluye los usuarios asociados
-                players: true, // Incluye los jugadores asociados
+                users: true,
+                players: true,
             },
+        });
+        if (!team) {
+            throw new NotFoundException(`Team with id ${id} not found`);
+        }
+        return new TeamEntity({
+            ...team,
+            users: team.users ? team.users.map((user) => new UserEntity(user)) : [],
+            players: team.players ? team.players.map((player) => player.id) : [],
         });
     }
 
-    async findPlayersByTeamId(teamId: string) {
-        return this.prisma.teams.findUnique({
+    async findPlayersByTeamId(teamId: string): Promise<String[]> {
+        const team = await this.prisma.teams.findUnique({
             where: {
                 id: teamId,
             },
             include: {
-                players: true, // Incluye los jugadores asociados
-                users: true, // Incluye los usuarios asociados
+                players: true,
             },
         });
+        if (!team) {
+            throw new NotFoundException(`Team with id ${teamId} not found`);
+        }
+        return team.players ? team.players.map((player) => player.id) : [];
     }
 
-    async update(id: string, updateTeamDto: UpdateTeamDto) {
-        return this.prisma.teams.update({
+    async update(id: string, updateTeamDto: UpdateTeamDto): Promise<TeamEntity> {
+        const team = await this.prisma.teams.update({
             where: {
                 id,
             },
-            data: {
-                name: updateTeamDto.name, // Only update the name
+            data: updateTeamDto,
+            include: {
+                users: true,
+                players: true,
+            },
+        });
+        if (!team) {
+            throw new NotFoundException(`Team with id ${id} not found`);
+        }
+        return new TeamEntity({
+            ...team,
+            users: team.users ? team.users.map((user) => new UserEntity(user)) : [],
+            players: team.players ? team.players.map((player) => player.id) : [],
+        });
+    }
+
+    async remove(id: string): Promise<TeamEntity> {
+        const teamDeleted = await this.prisma.teams.delete({
+            where: {
+                id,
             },
             include: {
                 users: true,
                 players: true,
             },
         });
-    }
-
-    async remove(id: string) {
-        return await this.prisma.teams.delete({
-            where: {
-                id,
-            },
-            include: {
-                users: true,
-                players: true,
-            },
+        if (!teamDeleted) {
+            throw new NotFoundException(`Team with id ${id} not found`);
+        }
+        return new TeamEntity({
+            ...teamDeleted,
+            users: teamDeleted.users ? teamDeleted.users.map((user) => new UserEntity(user)) : [],
+            players: teamDeleted.players ? teamDeleted.players.map((player) => player.id) : [],
         });
     }
 }

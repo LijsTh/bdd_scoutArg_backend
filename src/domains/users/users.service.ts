@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PasswordService } from 'src/utils/passwords/password.service';
+import { UserEntity } from './entities/user.entity';
+import e from 'express';
 
 @Injectable()
 export class UsersService {
@@ -11,28 +13,28 @@ export class UsersService {
         private readonly passwordService: PasswordService,
     ) {}
 
-    async create(createUserDto: CreateUserDto) {
+    async create(createUserDto: CreateUserDto): Promise<UserEntity> {
         createUserDto.password = await this.passwordService.hashPassword(createUserDto.password);
-        return this.prisma.users.create({
-            data: {
-                email: createUserDto.email,
-                name: createUserDto.name,
-                password: createUserDto.password,
-                team_id: createUserDto.team_id ?? null, // Si no tiene equipo, se asigna null
-            },
-        });
-    }
-
-    async findAll() {
-        return this.prisma.users.findMany({
+        const user = await this.prisma.users.create({
+            data: createUserDto,
             include: {
-                team: true, // Incluye los detalles del equipo si existe
+                team: true,
             },
         });
+        return new UserEntity(user);
     }
 
-    async findOne(id: string) {
-        return this.prisma.users.findUnique({
+    async findAll(): Promise<UserEntity[]> {
+        const users = await this.prisma.users.findMany({
+            include: {
+                team: true,
+            },
+        });
+        return users.map((user) => new UserEntity(user));
+    }
+
+    async findOne(id: string): Promise<UserEntity> {
+        const user = await this.prisma.users.findUnique({
             where: {
                 id,
             },
@@ -40,13 +42,17 @@ export class UsersService {
                 team: true, // Incluye los detalles del equipo si existe
             },
         });
+        if (!user) {
+            throw new NotFoundException(`User with id ${id} not found`);
+        }
+        return new UserEntity(user);
     }
 
-    async update(id: string, updateUserDto: UpdateUserDto) {
+    async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
         if (updateUserDto.password) {
             updateUserDto.password = await this.passwordService.hashPassword(updateUserDto.password);
         }
-        return this.prisma.users.update({
+        const user = await this.prisma.users.update({
             where: {
                 id,
             },
@@ -57,13 +63,21 @@ export class UsersService {
                 team_id: updateUserDto.team_id ?? null, // Si no tiene equipo, se asigna null
             },
         });
+        if (!user) {
+            throw new NotFoundException(`User with id ${id} not found`);
+        }
+        return new UserEntity(user);
     }
 
-    async remove(id: string) {
-        return this.prisma.users.delete({
+    async remove(id: string): Promise<UserEntity> {
+        const userDeleted = await this.prisma.users.delete({
             where: {
                 id,
             },
         });
+        if (!userDeleted) {
+            throw new NotFoundException(`User with id ${id} not found`);
+        }
+        return new UserEntity(userDeleted);
     }
 }

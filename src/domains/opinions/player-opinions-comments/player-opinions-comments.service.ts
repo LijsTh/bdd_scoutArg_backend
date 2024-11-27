@@ -34,7 +34,7 @@ export class PlayerOpinionsCommentsService {
             if (error instanceof NotFoundException) {
                 throw error;
             }
-            throw new BadRequestException(`Error creating opinion: ${error.message}`);
+            throw new InternalServerErrorException(`Error creating opinion: ${error.message}`);
         }
     }
 
@@ -83,7 +83,7 @@ export class PlayerOpinionsCommentsService {
             return updatedOpinion;
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
-            throw new BadRequestException(`Error updating opinion: ${error.message}`);
+            throw new InternalServerErrorException(`Error updating opinion: ${error.message}`);
         }
     }
 
@@ -121,7 +121,7 @@ export class PlayerOpinionsCommentsService {
             if (error instanceof NotFoundException) {
                 throw error;
             }
-            throw new BadRequestException(`Error adding comment: ${error.message}`);
+            throw new InternalServerErrorException(`Error adding comment: ${error.message}`);
         }
     }
 
@@ -172,7 +172,7 @@ export class PlayerOpinionsCommentsService {
             return updatedComment;
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
-            throw new BadRequestException(`Error updating comment: ${error.message}`);
+            throw new InternalServerErrorException(`Error updating comment: ${error.message}`);
         }
     }
 

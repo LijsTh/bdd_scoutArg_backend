@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, NotFoundException } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { RequestErrorBuilder } from '../../utils/exceptions/http-exception/request-error-builder';
+import { createFormattedError } from '../../utils/exceptions/http-exception/formatted-exeption';
 
 @Controller('users')
 @ApiTags('Users')
@@ -15,50 +15,63 @@ export class UsersController {
     @Post()
     @ApiCreatedResponse({ type: UserEntity })
     async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
-        const user = await this.usersService.create(createUserDto);
-        if (!user) {
-            throw RequestErrorBuilder.throwFormattedPostError('User');
+        try {
+            return new UserEntity(await this.usersService.create(createUserDto));
+        } catch (error) {
+            throw createFormattedError('Error creating User', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return new UserEntity(user);
     }
 
     @Get()
     @ApiOkResponse({ type: UserEntity, isArray: true })
     async findAll(): Promise<UserEntity[]> {
-        const users = await this.usersService.findAll();
-        if (!users) {
-            throw RequestErrorBuilder.throwFormattedGetError('User', '/users');
+        try {
+            return await this.usersService.findAll();
+        } catch (error) {
+            throw createFormattedError('Error obtaining Users', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return users.map((user) => new UserEntity(user));
     }
 
     @Get(':id')
     @ApiOkResponse({ type: UserEntity })
     async findOne(@Param('id') id: string): Promise<UserEntity> {
-        const user = await this.usersService.findOne(id);
-        if (!user) {
-            throw RequestErrorBuilder.throwFormattedGetError('User', `/users/${id}`, `User with ID ${id} not found.`);
+        try {
+            return await this.usersService.findOne(id);
+        } catch (error) {
+            const title = 'Error obtaining User';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return new UserEntity(user);
     }
 
     @Patch(':id')
     @ApiCreatedResponse({ type: UserEntity })
     async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserEntity> {
-        const user = await this.usersService.update(id, updateUserDto);
-        if (!user) {
-            throw RequestErrorBuilder.throwFormattedPatchError('User', `/users/${id}`, id);
+        try {
+            return new UserEntity(await this.usersService.update(id, updateUserDto));
+        } catch (error) {
+            const title = 'Error updating User';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return new UserEntity(user);
     }
 
     @Delete(':id')
     @ApiNoContentResponse({ description: 'User deleted' })
-    async remove(@Param('id') id: string, @Res() res: Response) {
-        const user = await this.usersService.remove(id);
-        if (!user) {
-            throw RequestErrorBuilder.throwFormattedDeleteError('User', `/users/${id}`, id);
+    async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
+        try {
+            await this.usersService.remove(id);
+            res.status(HttpStatus.NO_CONTENT).send();
+        } catch (error) {
+            const title = 'Error deleting User';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        res.status(HttpStatus.NO_CONTENT).send();
     }
 }

@@ -4,10 +4,10 @@ import { AppModule } from './app.module';
 import { ValidationError } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpAdapterHost } from '@nestjs/core';
-import { PrismaClientExceptionFilter } from './utils/exceptions/prisma-client-exception/prisma-client-exception.filter';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ValidationErr, FormattedExceptionWithValidation } from './utils/exceptions/http-exception/formatted-exeption';
+import { ExceptionFilter } from './utils/exceptions/http-exception/error-filter-handler';
 
 export function validationExceptionFactory(errors: ValidationError[]) {
     const parsedErrors: ValidationErr[] = [];
@@ -59,7 +59,7 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
 
     const { httpAdapter } = app.get(HttpAdapterHost);
-    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
+    app.useGlobalFilters(new ExceptionFilter(httpAdapter));
 
     await app.listen(process.env.PORT ?? 3000);
 }

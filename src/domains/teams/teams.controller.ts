@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, NotFoundException } from '@nestjs/common';
 import { Response } from 'express';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -7,7 +7,7 @@ import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from
 import { TeamEntity } from './entities/team.entity';
 import { PlayerEntity } from '../players/entities/player.entity';
 import { UserEntity } from '../users/entities/user.entity';
-import { RequestErrorBuilder } from 'src/utils/exceptions/http-exception/request-error-builder';
+import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 
 @Controller('teams')
 @ApiTags('Teams')
@@ -17,97 +17,77 @@ export class TeamsController {
     @Post()
     @ApiCreatedResponse({ type: TeamEntity })
     async create(@Body() createTeamDto: CreateTeamDto): Promise<TeamEntity> {
-        const team = await this.teamsService.create(createTeamDto);
-        if (!team) {
-            throw RequestErrorBuilder.throwFormattedPostError('Team');
+        try {
+            return new TeamEntity(await this.teamsService.create(createTeamDto));
+        } catch (error) {
+            throw createFormattedError('Error creating Team', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return new TeamEntity(team);
     }
 
     @Get()
     @ApiOkResponse({ type: TeamEntity, isArray: true })
     async findAll(): Promise<TeamEntity[]> {
-        const teams = await this.teamsService.findAll();
-        if (!teams) {
-            throw RequestErrorBuilder.throwFormattedGetError('Team', '/teams');
+        try {
+            return await this.teamsService.findAll();
+        } catch (error) {
+            throw createFormattedError('Error obtaining Teams', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return teams.map(
-            (team: { users: any[]; players: any[] }) =>
-                new TeamEntity({
-                    ...team,
-                    users: team?.users ? team.users.map((user: any) => new UserEntity(user)) : [],
-                    players: team.players.map((player: { id: string }) => player.id), // Assuming players should be an array of strings (IDs)
-                }),
-        );
     }
 
     @Get(':id')
     @ApiOkResponse({ type: TeamEntity })
     async findOne(@Param('id') id: string): Promise<TeamEntity> {
-        const team = await this.teamsService.findOne(id);
-        if (!team) {
-            throw RequestErrorBuilder.throwFormattedGetError('Team', `/teams/${id}`, `Team with ID ${id} not found.`);
+        try {
+            return await this.teamsService.findOne(id);
+        } catch (error) {
+            const title = 'Error obtaining Team';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return new TeamEntity({
-            ...team,
-            users: team?.users?.map((user: any) => new UserEntity(user)) || [],
-            players: team?.players?.map((player: { id: string }) => player.id) || [],
-        });
     }
 
     @Get(':id/players')
     @ApiOkResponse({ type: [PlayerEntity] })
-    async findPlayersByTeam(@Param('id') id: string) {
-        const team = await this.teamsService.findOne(id);
-        if (!team) {
-            throw RequestErrorBuilder.throwFormattedGetError('Team', `/teams/${id}`, `Team with ID ${id} not found.`);
+    async findPlayersByTeam(@Param('id') id: string): Promise<String[]> {
+        try {
+            return await this.teamsService.findPlayersByTeamId(id);
+        } catch (error) {
+            const title = 'Error obtaining Players by Team ID';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        if (!team.players) {
-            throw RequestErrorBuilder.throwFormattedGetError(
-                'Player',
-                `/teams/${id}/players`,
-                'No players found for this team.',
-            );
-        }
-        if (team.players.length === 0) {
-            // This may be unnecessary depending on the implementation of the frontend
-            throw RequestErrorBuilder.throwFormattedGetError(
-                'Player',
-                `/teams/${id}/players`,
-                'No players found for this team.',
-            );
-        }
-        return team.players;
     }
 
     @Patch(':id')
     @ApiCreatedResponse({ type: TeamEntity })
     async update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto): Promise<TeamEntity> {
-        if ('users' in updateTeamDto || 'players' in updateTeamDto) {
-            throw RequestErrorBuilder.throwFormattedPatchBodyError(
-                'Team',
-                `/teams/${id}`,
-                'Cannot update users or players. Only the name field can be updated.',
-            );
+        try {
+            return new TeamEntity(await this.teamsService.update(id, updateTeamDto));
+        } catch (error) {
+            const title = 'Error updating Team';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        const team = await this.teamsService.update(id, updateTeamDto);
-        if (!team) {
-            throw RequestErrorBuilder.throwFormattedPatchError('Team', `/teams/${id}`, id);
-        }
-        return new TeamEntity({
-            ...team,
-            users: team?.users?.map((user: any) => new UserEntity(user)) || [],
-            players: team?.players?.map((player: { id: string }) => player.id) || [],
-        });
     }
 
     @Delete(':id')
     @ApiNoContentResponse({ description: 'Team deleted' })
     async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
-        const team = await this.teamsService.remove(id);
-        if (!team) {
-            throw RequestErrorBuilder.throwFormattedDeleteError('Team', `/teams/${id}`, id);
+        try {
+            await this.teamsService.remove(id);
+            res.status(HttpStatus.NO_CONTENT).send();
+        } catch (error) {
+            const title = 'Error deleting Team';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        res.status(HttpStatus.NO_CONTENT).send();
     }
 }

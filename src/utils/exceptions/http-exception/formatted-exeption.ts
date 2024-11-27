@@ -14,6 +14,10 @@ export class FormattedException extends HttpException {
     }
 }
 
+export function createFormattedError(title: string, status: number, exception: Error) {
+    return new FormattedException(title, status, exception.message, '');
+}
+
 export class ValidationErr {
     field: string;
     reason: string;

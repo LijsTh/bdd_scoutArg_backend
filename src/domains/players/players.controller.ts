@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, NotFoundException } from '@nestjs/common';
 import { Response } from 'express';
 import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PlayerEntity } from './entities/player.entity';
-import { RequestErrorBuilder } from 'src/utils/exceptions/http-exception/request-error-builder';
+import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 
 @Controller('players')
 @ApiTags('Players')
@@ -15,35 +15,35 @@ export class PlayersController {
     @Post()
     @ApiCreatedResponse({ type: PlayerEntity })
     async create(@Body() createPlayerDto: CreatePlayerDto): Promise<PlayerEntity> {
-        const player = await this.playersService.create(createPlayerDto);
-        if (!player) {
-            throw RequestErrorBuilder.throwFormattedPostError('Player');
+        try {
+            return await this.playersService.create(createPlayerDto);
+        } catch (error) {
+            throw createFormattedError('Error creating Player', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return player;
     }
 
     @Get()
     @ApiOkResponse({ type: PlayerEntity, isArray: true })
     async findAll(): Promise<PlayerEntity[]> {
-        const players = await this.playersService.findAll();
-        if (!players) {
-            throw RequestErrorBuilder.throwFormattedGetError('Player', '/players');
+        try {
+            return await this.playersService.findAll();
+        } catch (error) {
+            throw createFormattedError('Error obtaining Players', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return players;
     }
 
     @Get(':id')
     @ApiOkResponse({ type: PlayerEntity })
     async findOne(@Param('id') id: string): Promise<PlayerEntity> {
-        const player = await this.playersService.findOne(id);
-        if (!player) {
-            throw RequestErrorBuilder.throwFormattedGetError(
-                'Player',
-                `/players/${id}`,
-                `Player with ID ${id} not found.`,
-            );
+        try {
+            return await this.playersService.findOne(id);
+        } catch (error) {
+            const title = 'Error obtaining Player';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return player;
     }
 
     @Patch(':id')
@@ -53,20 +53,29 @@ export class PlayersController {
         @Body()
         updatePlayerDto: UpdatePlayerDto,
     ): Promise<PlayerEntity> {
-        const player = await this.playersService.update(id, updatePlayerDto);
-        if (!player) {
-            throw RequestErrorBuilder.throwFormattedPatchError('Player', `/players/${id}`, id);
+        try {
+            return await this.playersService.update(id, updatePlayerDto);
+        } catch (error) {
+            const title = 'Error updating Player';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        return player;
     }
 
     @Delete(':id')
     @ApiNoContentResponse({ description: 'Player deleted' })
     async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
-        const player = await this.playersService.remove(id);
-        if (!player) {
-            throw RequestErrorBuilder.throwFormattedDeleteError('Player', `/players/${id}`, id);
+        try {
+            await this.playersService.remove(id);
+            res.status(HttpStatus.NO_CONTENT).send();
+        } catch (error) {
+            const title = 'Error deleting Player';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
-        res.status(HttpStatus.NO_CONTENT).send();
     }
 }

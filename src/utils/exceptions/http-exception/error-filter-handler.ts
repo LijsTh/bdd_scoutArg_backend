@@ -1,12 +1,50 @@
 import { ArgumentsHost, Catch, HttpStatus } from '@nestjs/common';
+import { PrismaErrorFormatter } from '../prisma-client-exception/prisma-error-formatter.filter'; // Adjust the path as necessary
 import { BaseExceptionFilter } from '@nestjs/core';
-import { Prisma } from '@prisma/client';
 import { Response } from 'express';
-import { PrismaErrorFormatter } from './prisma-error-formatter.filter';
+import { Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
-@Catch(Prisma.PrismaClientKnownRequestError)
-export class PrismaClientExceptionFilter extends BaseExceptionFilter {
-    catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
+@Catch()
+export class ExceptionFilter extends BaseExceptionFilter {
+    private readonly logger = new Logger(ExceptionFilter.name);
+
+    catch(exception: any, host: ArgumentsHost) {
+        if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+            this.handlePrismaException(exception, host);
+            return;
+        }
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse<Response>();
+        const request = ctx.getRequest();
+        const instance = request.url;
+
+        const status = exception.getStatus ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+        if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+            this.logger.error(`500 Error - ${request.method} ${request.url}: ${exception.message}`, exception.stack);
+            response.status(status).json({
+                title: 'Unexpected Server Error',
+                status: exception.response.status,
+                detail: 'A server error ocurred, please try again or contact administrator',
+                instance: instance,
+            });
+        } else {
+            const errorResponse: any = {
+                title: exception.response?.title || 'Error',
+                status: exception.response?.status || status,
+                detail: exception.response?.detail || 'Invalid Request Format',
+                instance: instance,
+            };
+
+            if (exception.response?.validationsErrors) {
+                errorResponse.validationsErrors = exception.response.validationsErrors;
+            }
+
+            response.status(status).json(errorResponse);
+        }
+    }
+
+    private handlePrismaException(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
         const request = ctx.getRequest();

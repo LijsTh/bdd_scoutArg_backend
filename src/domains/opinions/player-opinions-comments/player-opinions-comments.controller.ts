@@ -6,7 +6,7 @@ import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from
 import { PlayerOpinionEntity } from './opinions_entity/player-opinion.entity';
 import { CreatePlayerCommentDto } from './comments_dtos/create-player-comment.dto';
 import { PlayerCommentEntity } from './comments_entity/player-comment.entity';
-import { RequestErrorBuilder } from '../../../utils/exceptions/http-exception/request-error-builder';
+import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 
 @Controller('player-opinions')
 @ApiTags('Player Opinions Comments')
@@ -22,12 +22,11 @@ export class PlayerOpinionsCommentsController {
             const opinion = await this.service.createOpinion(createOpinionDto);
             return opinion;
         } catch (error) {
+            const title = 'Error creating Opinion';
             if (error instanceof NotFoundException) {
-                const instance = `/player-opinions/opinions?user_id=${createOpinionDto.user_id}&player_id=${createOpinionDto.player_id}`;
-                throw RequestErrorBuilder.throwFormattedGetError('Opinion', instance, error.message);
-            } else {
-                throw RequestErrorBuilder.throwFormattedPostError('Opinion');
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
             }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -35,14 +34,13 @@ export class PlayerOpinionsCommentsController {
     @ApiOkResponse({ type: PlayerOpinionEntity })
     async getOpinion(@Param('id') id: string): Promise<PlayerOpinionEntity> {
         try {
-            const opinion = await this.service.getOpinionById(id);
-            return opinion;
+            return await this.service.getOpinionById(id);
         } catch (error) {
-            throw RequestErrorBuilder.throwFormattedGetError(
-                'Opinion',
-                `/player-opinions/opinions/${id}`,
-                `Opinion with ID ${id} not found`,
-            );
+            const title = 'Error obtaining Opinion';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -52,7 +50,7 @@ export class PlayerOpinionsCommentsController {
         try {
             return await this.service.getOpinions();
         } catch (error) {
-            throw RequestErrorBuilder.throwFormattedGetError('Opinion', '/player-opinions/opinions');
+            throw createFormattedError('Error obtaining Opinions', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -65,14 +63,11 @@ export class PlayerOpinionsCommentsController {
         try {
             return await this.service.updateOpinion(id, updateOpinionDto);
         } catch (error) {
+            const title = 'Error updating Opinion';
             if (error instanceof NotFoundException) {
-                throw RequestErrorBuilder.throwFormattedGetError(
-                    'Opinion',
-                    `/player-opinions/opinions/${id}`,
-                    error.message,
-                );
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
             }
-            throw RequestErrorBuilder.throwFormattedPatchError('Opinion', `/player-opinions/opinions/${id}`, id);
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -82,14 +77,11 @@ export class PlayerOpinionsCommentsController {
         try {
             await this.service.deleteOpinion(id);
         } catch (error) {
+            const title = 'Error deleting Opinion';
             if (error instanceof NotFoundException) {
-                throw RequestErrorBuilder.throwFormattedGetError(
-                    'Opinion',
-                    `/player-opinions/opinions/${id}`,
-                    error.message,
-                );
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
             }
-            throw RequestErrorBuilder.throwFormattedDeleteError('Opinion', `/player-opinions/opinions/${id}`, id);
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
         res.status(HttpStatus.NO_CONTENT).send();
     }
@@ -105,11 +97,7 @@ export class PlayerOpinionsCommentsController {
         try {
             return await this.service.addCommentToOpinion(opinionId, createCommentDto);
         } catch (error) {
-            if (error instanceof NotFoundException) {
-                const instance = `/player-opinions/opinions/opinions?user_id=${createCommentDto.user_id}&opinion_id=${createCommentDto.player_opinion_id}`;
-                throw RequestErrorBuilder.throwFormattedGetError('Opinion', instance, error.message);
-            }
-            throw RequestErrorBuilder.throwFormattedPostError('Comment');
+            throw createFormattedError('Error creating Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -119,10 +107,10 @@ export class PlayerOpinionsCommentsController {
         try {
             return await this.service.getCommentsForOpinion(opinionId);
         } catch (error) {
-            throw RequestErrorBuilder.throwFormattedGetError(
-                'Comment',
-                `/player-opinions/opinions/${opinionId}/comments`,
-            );
+            if (error instanceof NotFoundException) {
+                throw createFormattedError('Error obtaining Comments for Opinion', HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError('Error obtaining Comments for Opinion', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -136,16 +124,9 @@ export class PlayerOpinionsCommentsController {
             return await this.service.getCommentByIdForOpinion(opinionId, commentId);
         } catch (error) {
             if (error instanceof NotFoundException) {
-                throw RequestErrorBuilder.throwFormattedGetError(
-                    'Comment',
-                    `/player-opinions/opinions/${opinionId}/comments/${commentId}`,
-                    error.message,
-                );
+                throw createFormattedError('Error obtaining Comment', HttpStatus.NOT_FOUND, error);
             }
-            throw RequestErrorBuilder.throwFormattedGetError(
-                'Comment',
-                `/player-opinions/opinions/${opinionId}/comments/${commentId}`,
-            );
+            throw createFormattedError('Error obtaining Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -160,17 +141,9 @@ export class PlayerOpinionsCommentsController {
             return await this.service.updateComment(opinionId, commentId, updateCommentDto);
         } catch (error) {
             if (error instanceof NotFoundException) {
-                throw RequestErrorBuilder.throwFormattedGetError(
-                    'Comment',
-                    `/player-opinions/opinions/${opinionId}/comments/${commentId}`,
-                    error.message,
-                );
+                throw createFormattedError('Error updating Comment', HttpStatus.NOT_FOUND, error);
             }
-            throw RequestErrorBuilder.throwFormattedPatchError(
-                'Comment',
-                `/player-opinions/opinions/${opinionId}/comments/${commentId}`,
-                commentId,
-            );
+            throw createFormattedError('Error updating Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -180,22 +153,14 @@ export class PlayerOpinionsCommentsController {
         @Param('opinionId') opinionId: string,
         @Param('commentId') commentId: string,
         @Res() res: Response,
-    ) {
+    ): Promise<void> {
         try {
             await this.service.deleteComment(opinionId, commentId);
         } catch (error) {
             if (error instanceof NotFoundException) {
-                throw RequestErrorBuilder.throwFormattedGetError(
-                    'Comment',
-                    `/player-opinions/opinions/${opinionId}/comments/${commentId}`,
-                    error.message,
-                );
+                throw createFormattedError('Error deleting Comment', HttpStatus.NOT_FOUND, error);
             }
-            throw RequestErrorBuilder.throwFormattedDeleteError(
-                'Comment',
-                `/player-opinions/opinions/${opinionId}/comments/${commentId}`,
-                commentId,
-            );
+            throw createFormattedError('Error deleting Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
         res.status(HttpStatus.NO_CONTENT).send();
     }
