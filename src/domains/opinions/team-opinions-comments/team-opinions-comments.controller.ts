@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, NotFoundException, Res, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 import { TeamOpinionsCommentsService } from './team-opinions-comments.service';
 import { CreateTeamOpinionDto } from './opinions_dtos/create-team-opinion.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamOpinionEntity } from './opinions_entity/team-opinion.entity';
 import { CreateTeamCommentDto } from './comments_dtos/create-team-comment.dto';
 import { TeamCommentEntity } from './comments_entity/team-comment.entity';
@@ -76,10 +77,10 @@ export class TeamOpinionsCommentsController {
     }
 
     @Delete('opinions/:id')
-    @ApiOkResponse({ type: TeamOpinionEntity })
-    async deleteOpinion(@Param('id') id: string): Promise<TeamOpinionEntity> {
+    @ApiNoContentResponse({ description: 'Opinion deleted' })
+    async deleteOpinion(@Param('id') id: string, @Res() res: Response) {
         try {
-            return await this.service.deleteOpinion(id);
+            await this.service.deleteOpinion(id);
         } catch (error) {
             if (error instanceof NotFoundException) {
                 throw RequestErrorBuilder.throwFormattedGetError(
@@ -90,6 +91,7 @@ export class TeamOpinionsCommentsController {
             }
             throw RequestErrorBuilder.throwFormattedDeleteError('Opinion', `/team-opinions/opinions/${id}`, id);
         }
+        res.status(HttpStatus.NO_CONTENT).send();
     }
 
     // -------------------------- Team Comments --------------------------//
@@ -143,13 +145,14 @@ export class TeamOpinionsCommentsController {
     }
 
     @Delete('opinions/:opinionId/comments/:commentId')
-    @ApiOkResponse({ type: TeamCommentEntity })
+    @ApiNoContentResponse({ description: 'Comment deleted' })
     async deleteComment(
         @Param('opinionId') opinionId: string,
         @Param('commentId') commentId: string,
-    ): Promise<TeamCommentEntity> {
+        @Res() res: Response,
+    ) {
         try {
-            return await this.service.deleteComment(opinionId, commentId);
+            await this.service.deleteComment(opinionId, commentId);
         } catch (error) {
             throw RequestErrorBuilder.throwFormattedDeleteError(
                 'Comment',
@@ -157,5 +160,6 @@ export class TeamOpinionsCommentsController {
                 commentId,
             );
         }
+        res.status(HttpStatus.NO_CONTENT).send();
     }
 }

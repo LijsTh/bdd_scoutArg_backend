@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamEntity } from './entities/team.entity';
 import { PlayerEntity } from '../players/entities/player.entity';
 import { UserEntity } from '../users/entities/user.entity';
@@ -101,16 +102,12 @@ export class TeamsController {
     }
 
     @Delete(':id')
-    @ApiOkResponse({ type: TeamEntity })
-    async remove(@Param('id') id: string): Promise<TeamEntity> {
+    @ApiNoContentResponse({ description: 'Team deleted' })
+    async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
         const team = await this.teamsService.remove(id);
         if (!team) {
             throw RequestErrorBuilder.throwFormattedDeleteError('Team', `/teams/${id}`, id);
         }
-        return new TeamEntity({
-            ...team,
-            users: team?.users?.map((user: any) => new UserEntity(user)) || [],
-            players: team?.players?.map((player: { id: string }) => player.id) || [],
-        });
+        res.status(HttpStatus.NO_CONTENT).send();
     }
 }

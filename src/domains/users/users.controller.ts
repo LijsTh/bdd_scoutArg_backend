@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { RequestErrorBuilder } from '../../utils/exceptions/http-exception/request-error-builder';
 
@@ -52,12 +53,12 @@ export class UsersController {
     }
 
     @Delete(':id')
-    @ApiOkResponse({ type: UserEntity })
-    async remove(@Param('id') id: string): Promise<UserEntity> {
+    @ApiNoContentResponse({ description: 'User deleted' })
+    async remove(@Param('id') id: string, @Res() res: Response) {
         const user = await this.usersService.remove(id);
         if (!user) {
             throw RequestErrorBuilder.throwFormattedDeleteError('User', `/users/${id}`, id);
         }
-        return new UserEntity(user);
+        res.status(HttpStatus.NO_CONTENT).send();
     }
 }

@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, HttpException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, NotFoundException, Res, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
 import { PlayerOpinionsCommentsService } from './player-opinions-comments.service';
 import { CreatePlayerOpinionDto } from './opinions_dtos/create-player-opinion.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PlayerOpinionEntity } from './opinions_entity/player-opinion.entity';
 import { CreatePlayerCommentDto } from './comments_dtos/create-player-comment.dto';
 import { PlayerCommentEntity } from './comments_entity/player-comment.entity';
@@ -76,10 +77,10 @@ export class PlayerOpinionsCommentsController {
     }
 
     @Delete('opinions/:id')
-    @ApiOkResponse({ type: PlayerOpinionEntity })
-    async deleteOpinion(@Param('id') id: string): Promise<PlayerOpinionEntity> {
+    @ApiNoContentResponse({ description: 'Opinion deleted' })
+    async deleteOpinion(@Param('id') id: string, @Res() res: Response) {
         try {
-            return await this.service.deleteOpinion(id);
+            await this.service.deleteOpinion(id);
         } catch (error) {
             if (error instanceof NotFoundException) {
                 throw RequestErrorBuilder.throwFormattedGetError(
@@ -90,6 +91,7 @@ export class PlayerOpinionsCommentsController {
             }
             throw RequestErrorBuilder.throwFormattedDeleteError('Opinion', `/player-opinions/opinions/${id}`, id);
         }
+        res.status(HttpStatus.NO_CONTENT).send();
     }
 
     // -------------------------- Player Comments --------------------------//
@@ -173,13 +175,14 @@ export class PlayerOpinionsCommentsController {
     }
 
     @Delete('opinions/:opinionId/comments/:commentId')
-    @ApiOkResponse({ type: PlayerCommentEntity })
+    @ApiNoContentResponse({ description: 'Comment deleted' })
     async deleteComment(
         @Param('opinionId') opinionId: string,
         @Param('commentId') commentId: string,
-    ): Promise<PlayerCommentEntity> {
+        @Res() res: Response,
+    ) {
         try {
-            return await this.service.deleteComment(opinionId, commentId);
+            await this.service.deleteComment(opinionId, commentId);
         } catch (error) {
             if (error instanceof NotFoundException) {
                 throw RequestErrorBuilder.throwFormattedGetError(
@@ -194,5 +197,6 @@ export class PlayerOpinionsCommentsController {
                 commentId,
             );
         }
+        res.status(HttpStatus.NO_CONTENT).send();
     }
 }

@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PlayerEntity } from './entities/player.entity';
 import { RequestErrorBuilder } from 'src/utils/exceptions/http-exception/request-error-builder';
 
@@ -60,12 +61,12 @@ export class PlayersController {
     }
 
     @Delete(':id')
-    @ApiOkResponse({ type: PlayerEntity })
-    async remove(@Param('id') id: string): Promise<PlayerEntity> {
+    @ApiNoContentResponse({ description: 'Player deleted' })
+    async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
         const player = await this.playersService.remove(id);
         if (!player) {
             throw RequestErrorBuilder.throwFormattedDeleteError('Player', `/players/${id}`, id);
         }
-        return player;
+        res.status(HttpStatus.NO_CONTENT).send();
     }
 }
