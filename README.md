@@ -80,7 +80,7 @@ $ npm install
 
 ### 2. Configure environment variables
 
-Create a `.env` file in the `src` directory and configure the necessary environment variables for the database and Firebase connection.
+Create a `.env` file in the `src` directory and configure the necessary environment variables for the database, Firebase connection and JWT Authentication
 
 Example configuration:
 
@@ -93,6 +93,9 @@ DIRECT_URL="postgresql://postgres.aukamsjbzhgvkbwjkehl:[PASSWORD]@aws-0-sa-east-
 
 ## DATABASE ENVS FOR FIREBASE
 GOOGLE_APPLICATION_CREDENTIALS="path_to_serviceAccountKey.json"
+
+## AUTH JWT SECRET
+JWT_SECRET='example_jwt'
 ```
 
 > **Important**: Replace `[PASSWORD]` with the actual PostgreSQL password and set the correct path for the **serviceAccountKey.json** file. The `serviceAccountKey.json` should be placed in the **root** of your project.

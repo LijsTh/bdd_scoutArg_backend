@@ -96,11 +96,11 @@ export class UsersService {
             throw new NotFoundException('Invalid password');
         }
 
-        const payload: JwtPayload = { user: user.id };
+        const payload: JwtPayload = { userID: user.id };
         const token = generateToken(payload);
 
         return {
-            ...user,
+            id: user.id,
             token,
         };
     }

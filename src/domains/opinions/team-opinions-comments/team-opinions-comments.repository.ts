@@ -29,6 +29,11 @@ export class TeamOpinionsCommentsRepository {
         return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     }
 
+    async getOpinionsByTeamId(teamId: string): Promise<any[]> {
+        const snapshot = await this.teamOpinionsCollection.where('team_id', '==', teamId).get();
+        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    }
+
     async updateOpinion(id: string, opinion: any): Promise<any> {
         const plainOpinion = JSON.parse(JSON.stringify(opinion));
         await this.teamOpinionsCollection.doc(id).update(plainOpinion);
@@ -55,6 +60,12 @@ export class TeamOpinionsCommentsRepository {
     async getCommentsForOpinion(opinionId: string): Promise<any[]> {
         const snapshot = await this.teamOpinionsCollection.doc(opinionId).collection('comments').get();
         return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    }
+
+    async getCommentByIdForOpinion(opinionId: string, commentId: string): Promise<any> {
+        const commentRef = this.teamOpinionsCollection.doc(opinionId).collection('comments').doc(commentId);
+        const commentSnapshot = await commentRef.get();
+        return commentSnapshot.exists ? { id: commentSnapshot.id, ...commentSnapshot.data() } : null;
     }
 
     async updateComment(opinionId: string, commentId: string, comment: any): Promise<any> {

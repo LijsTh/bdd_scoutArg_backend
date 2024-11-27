@@ -27,6 +27,11 @@ export class PlayersOpinionsCommentsRepository {
         return doc.exists ? { id: doc.id, ...doc.data() } : null;
     }
 
+    async getOpinionsByPlayerId(playerId: string): Promise<any[]> {
+        const snapshot = await this.playerOpinionsCollection.where('player_id', '==', playerId).get();
+        return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    }
+
     async getOpinions(): Promise<any[]> {
         const snapshot = await this.playerOpinionsCollection.get();
         return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));

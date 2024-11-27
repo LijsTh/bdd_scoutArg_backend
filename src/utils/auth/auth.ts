@@ -1,8 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 
 export interface JwtPayload {
-    user: string;
-    [key: string]: any;
+    userID: string;
 }
 
 export function generateToken(payload: JwtPayload): string {
@@ -22,9 +21,6 @@ export function validateToken(token: string): JwtPayload {
     }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    if (typeof payload === 'string') {
-        throw new Error('Invalid token payload');
-    }
     return payload as JwtPayload;
 }
 

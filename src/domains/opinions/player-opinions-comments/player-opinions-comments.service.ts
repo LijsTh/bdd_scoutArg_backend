@@ -1,8 +1,10 @@
-import { Injectable, BadRequestException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import { PlayersOpinionsCommentsRepository } from './player-opinions-comments.repository';
 import { CreatePlayerOpinionDto } from './opinions_dtos/create-player-opinion.dto';
 import { CreatePlayerCommentDto } from './comments_dtos/create-player-comment.dto';
 import { PrismaService } from '../../../database/prisma/prisma.service';
+import { UpdatePlayerOpinionDto } from './opinions_dtos/update-player-opinion.dto';
+import { UpdatePlayerCommentDto } from './comments_dtos/update-player-comment.dto';
 
 @Injectable()
 export class PlayerOpinionsCommentsService {
@@ -51,6 +53,19 @@ export class PlayerOpinionsCommentsService {
         }
     }
 
+    async getOpinionsForPlayer(playerId: string) {
+        try {
+            const opinions = await this.repository.getOpinionsByPlayerId(playerId);
+            if (!opinions) {
+                throw new NotFoundException(`No opinions found for player with ID ${playerId}`);
+            }
+            return opinions;
+        } catch (error) {
+            if (error instanceof NotFoundException) throw error;
+            throw new InternalServerErrorException(`Error fetching opinions: ${error.message}`);
+        }
+    }
+
     async getOpinions() {
         try {
             return await this.repository.getOpinions();
@@ -59,7 +74,7 @@ export class PlayerOpinionsCommentsService {
         }
     }
 
-    async updateOpinion(id: string, updateOpinionDto: CreatePlayerOpinionDto) {
+    async updateOpinion(id: string, updateOpinionDto: UpdatePlayerOpinionDto) {
         try {
             const userExists = await this.prisma.users.findUnique({
                 where: { id: updateOpinionDto.user_id },
@@ -67,13 +82,20 @@ export class PlayerOpinionsCommentsService {
             if (!userExists) {
                 throw new NotFoundException(`User with ID ${updateOpinionDto.user_id} not found`);
             }
-
             const playerExists = await this.prisma.players.findUnique({
                 where: { id: updateOpinionDto.player_id },
             });
 
             if (!playerExists) {
                 throw new NotFoundException(`Player with ID ${updateOpinionDto.player_id} not found`);
+            }
+
+            const opinion = await this.repository.getOpinionById(id);
+            if (!opinion) {
+                throw new NotFoundException(`Opinion with ID ${id} not found`);
+            }
+            if (opinion.user_id !== updateOpinionDto.user_id) {
+                throw new ConflictException('The user_id does not match the user_id of the opinion');
             }
 
             const updatedOpinion = await this.repository.updateOpinion(id, updateOpinionDto);
@@ -87,8 +109,15 @@ export class PlayerOpinionsCommentsService {
         }
     }
 
-    async deleteOpinion(id: string) {
+    async deleteOpinion(id: string, userID: string) {
         try {
+            const opinion = await this.repository.getOpinionById(id);
+            if (!opinion) {
+                throw new NotFoundException(`Opinion with ID ${id} not found`);
+            }
+            if (opinion.user_id !== userID) {
+                throw new ConflictException('The user_id does not match the user_id of the opinion');
+            }
             const result = await this.repository.deleteOpinion(id);
             if (!result) {
                 throw new NotFoundException(`Opinion with ID ${id} not found`);
@@ -151,7 +180,7 @@ export class PlayerOpinionsCommentsService {
         }
     }
 
-    async updateComment(opinionId: string, commentId: string, updateCommentDto: CreatePlayerCommentDto) {
+    async updateComment(opinionId: string, commentId: string, updateCommentDto: UpdatePlayerCommentDto) {
         try {
             const userExists = await this.prisma.users.findUnique({
                 where: { id: updateCommentDto.user_id },
@@ -160,9 +189,17 @@ export class PlayerOpinionsCommentsService {
                 throw new NotFoundException(`User with ID ${updateCommentDto.user_id} not found`);
             }
 
-            const doc = await this.repository.getOpinionById(opinionId);
-            if (!doc) {
+            const opinion = await this.repository.getOpinionById(opinionId);
+            if (!opinion) {
                 throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
+            }
+
+            const comment = await this.repository.getCommentByIdForOpinion(opinionId, commentId);
+            if (!comment) {
+                throw new NotFoundException(`Comment with ID ${commentId} not found for opinion with ID ${opinionId}`);
+            }
+            if (comment.user_id !== updateCommentDto.user_id) {
+                throw new ConflictException('The user_id does not match the user_id of the comment');
             }
 
             const updatedComment = await this.repository.updateComment(opinionId, commentId, updateCommentDto);
@@ -176,11 +213,14 @@ export class PlayerOpinionsCommentsService {
         }
     }
 
-    async deleteComment(opinionId: string, commentId: string) {
+    async deleteComment(opinionId: string, commentId: string, userId: string) {
         try {
             const opinion = await this.repository.getOpinionById(opinionId);
             if (!opinion) {
                 throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
+            }
+            if (opinion.user_id !== userId) {
+                throw new ConflictException('The user_id does not match the user_id of the opinion');
             }
             const result = await this.repository.deleteComment(opinionId, commentId);
             if (!result) {

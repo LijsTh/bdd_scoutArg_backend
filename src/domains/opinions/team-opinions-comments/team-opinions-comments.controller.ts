@@ -1,14 +1,27 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, NotFoundException, Res, HttpStatus } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Patch,
+    Delete,
+    Body,
+    Param,
+    NotFoundException,
+    Res,
+    HttpStatus,
+    Request,
+    ConflictException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { TeamOpinionsCommentsService } from './team-opinions-comments.service';
 import { CreateTeamOpinionDto } from './opinions_dtos/create-team-opinion.dto';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamOpinionEntity } from './opinions_entity/team-opinion.entity';
 import { CreateTeamCommentDto } from './comments_dtos/create-team-comment.dto';
 import { TeamCommentEntity } from './comments_entity/team-comment.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 
-@Controller('team-opinions')
+@Controller('teams')
 @ApiTags('Team Opinions Comments')
 export class TeamOpinionsCommentsController {
     constructor(private readonly service: TeamOpinionsCommentsService) {}
@@ -16,26 +29,17 @@ export class TeamOpinionsCommentsController {
     // -------------------------- Team Opinions --------------------------//
 
     @Post('opinions')
+    @ApiBearerAuth()
     @ApiCreatedResponse({ type: CreateTeamOpinionDto })
-    async createOpinion(@Body() createOpinionDto: CreateTeamOpinionDto): Promise<TeamOpinionEntity> {
+    async createOpinion(
+        @Body() createOpinionDto: CreateTeamOpinionDto,
+        @Request() req: any,
+    ): Promise<TeamOpinionEntity> {
         try {
+            createOpinionDto.user_id = req.user.id;
             return await this.service.createOpinion(createOpinionDto);
         } catch (error) {
             throw createFormattedError('Error creating Opinion', HttpStatus.INTERNAL_SERVER_ERROR, error);
-        }
-    }
-
-    @Get('opinions/:id')
-    @ApiOkResponse({ type: TeamOpinionEntity })
-    async getOpinion(@Param('id') id: string): Promise<TeamOpinionEntity> {
-        try {
-            return await this.service.getOpinionById(id);
-        } catch (error) {
-            const title = 'Error obtaining Opinion';
-            if (error instanceof NotFoundException) {
-                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
-            }
-            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -49,16 +53,13 @@ export class TeamOpinionsCommentsController {
         }
     }
 
-    @Patch('opinions/:id')
+    @Get('opinion/:id')
     @ApiOkResponse({ type: TeamOpinionEntity })
-    async updateOpinion(
-        @Param('id') id: string,
-        @Body() updateOpinionDto: CreateTeamOpinionDto,
-    ): Promise<TeamOpinionEntity> {
+    async getOpinion(@Param('id') id: string): Promise<TeamOpinionEntity> {
         try {
-            return await this.service.updateOpinion(id, updateOpinionDto);
+            return await this.service.getOpinionById(id);
         } catch (error) {
-            const title = 'Error updating Opinion';
+            const title = 'Error obtaining Opinion';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
             }
@@ -66,15 +67,55 @@ export class TeamOpinionsCommentsController {
         }
     }
 
-    @Delete('opinions/:id')
-    @ApiNoContentResponse({ description: 'Opinion deleted' })
-    async deleteOpinion(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    @Get('opinions/:teamId')
+    @ApiOkResponse({ type: [TeamOpinionEntity] })
+    async getOpinionsByTeamId(@Param('teamId') teamId: string): Promise<TeamOpinionEntity[]> {
         try {
-            await this.service.deleteOpinion(id);
+            return await this.service.getOpinionsByTeamId(teamId);
+        } catch (error) {
+            const title = 'Error obtaining Opinions';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+
+    @Patch('opinions/:id')
+    @ApiBearerAuth()
+    @ApiOkResponse({ type: TeamOpinionEntity })
+    async updateOpinion(
+        @Param('id') id: string,
+        @Body() updateOpinionDto: CreateTeamOpinionDto,
+        @Request() req: any,
+    ): Promise<TeamOpinionEntity> {
+        try {
+            updateOpinionDto.user_id = req.user.id;
+            return await this.service.updateOpinion(id, updateOpinionDto);
+        } catch (error) {
+            const title = 'Error updating Opinion';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof ConflictException) {
+                throw createFormattedError(title, HttpStatus.CONFLICT, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+
+    @Delete('opinions/:id')
+    @ApiBearerAuth()
+    @ApiNoContentResponse({ description: 'Opinion deleted' })
+    async deleteOpinion(@Param('id') id: string, @Res() res: Response, @Request() req: any): Promise<void> {
+        try {
+            const userID = req.user.id;
+            await this.service.deleteOpinion(id, userID);
         } catch (error) {
             const title = 'Error deleting Opinion';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof ConflictException) {
+                throw createFormattedError(title, HttpStatus.CONFLICT, error);
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
@@ -84,12 +125,15 @@ export class TeamOpinionsCommentsController {
     // -------------------------- Team Comments --------------------------//
 
     @Post('opinions/:opinionId/comments')
+    @ApiBearerAuth()
     @ApiCreatedResponse({ type: CreateTeamCommentDto })
     async addComment(
         @Param('opinionId') opinionId: string,
         @Body() createCommentDto: CreateTeamCommentDto,
+        @Request() req: any,
     ): Promise<TeamCommentEntity> {
         try {
+            createCommentDto.user_id = req.user.id;
             return await this.service.addCommentToOpinion(opinionId, createCommentDto);
         } catch (error) {
             throw createFormattedError('Error creating Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
@@ -111,36 +155,45 @@ export class TeamOpinionsCommentsController {
     }
 
     @Patch('opinions/:opinionId/comments/:commentId')
+    @ApiBearerAuth()
     @ApiOkResponse({ type: TeamCommentEntity })
     async updateComment(
         @Param('opinionId') opinionId: string,
         @Param('commentId') commentId: string,
         @Body() updateCommentDto: CreateTeamCommentDto,
+        @Request() req: any,
     ): Promise<TeamCommentEntity> {
         try {
+            updateCommentDto.user_id = req.user.id;
             return await this.service.updateComment(opinionId, commentId, updateCommentDto);
         } catch (error) {
             const title = 'Error updating Comment';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof ConflictException) {
+                throw createFormattedError(title, HttpStatus.CONFLICT, error);
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 
     @Delete('opinions/:opinionId/comments/:commentId')
+    @ApiBearerAuth()
     @ApiNoContentResponse({ description: 'Comment deleted' })
     async deleteComment(
         @Param('opinionId') opinionId: string,
         @Param('commentId') commentId: string,
         @Res() res: Response,
+        @Request() req: any,
     ): Promise<void> {
         try {
-            await this.service.deleteComment(opinionId, commentId);
+            await this.service.deleteComment(opinionId, commentId, req.user.id);
         } catch (error) {
             const title = 'Error deleting Comment';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof ConflictException) {
+                throw createFormattedError(title, HttpStatus.CONFLICT, error);
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }

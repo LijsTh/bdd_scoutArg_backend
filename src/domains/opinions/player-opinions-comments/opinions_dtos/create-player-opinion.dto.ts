@@ -3,10 +3,7 @@ import { Type } from 'class-transformer';
 import { IsString, IsInt, IsNotEmpty, Max, Min, IsDate } from 'class-validator';
 
 export class CreatePlayerOpinionDto {
-    @ApiProperty({ example: 'user123', description: 'User ID' })
-    @IsNotEmpty({ message: 'User ID is required.' })
-    @IsString({ message: 'User ID must be a string.' })
-    user_id: string;
+    user_id?: string;
 
     @ApiProperty({ example: 'player123', description: 'Player ID' })
     @IsNotEmpty({ message: 'Player ID is required.' })

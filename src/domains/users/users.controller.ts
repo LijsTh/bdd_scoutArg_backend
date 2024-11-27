@@ -1,10 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, NotFoundException } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    HttpStatus,
+    Res,
+    NotFoundException,
+    Request,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LogInDto, LogInResponseDto } from './dto/login.dto';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { createFormattedError } from '../../utils/exceptions/http-exception/formatted-exeption';
 
@@ -47,10 +59,12 @@ export class UsersController {
         }
     }
 
-    @Patch(':id')
+    @Patch()
+    @ApiBearerAuth()
     @ApiCreatedResponse({ type: UserEntity })
-    async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserEntity> {
+    async update(@Body() updateUserDto: UpdateUserDto, @Request() req: any): Promise<UserEntity> {
         try {
+            const id = req.user;
             return new UserEntity(await this.usersService.update(id, updateUserDto));
         } catch (error) {
             const title = 'Error updating User';
@@ -62,9 +76,11 @@ export class UsersController {
     }
 
     @Delete(':id')
+    @ApiBearerAuth()
     @ApiNoContentResponse({ description: 'User deleted' })
-    async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    async remove(@Res() res: Response, @Request() req: any): Promise<void> {
         try {
+            const id = req.user;
             await this.usersService.remove(id);
             res.status(HttpStatus.NO_CONTENT).send();
         } catch (error) {
@@ -83,8 +99,11 @@ export class UsersController {
             const userData = await this.usersService.logIn(loginDto);
             return userData;
         } catch (error) {
-            // Falta manejar el error de autenticación
-            throw createFormattedError('Error logging in', HttpStatus.INTERNAL_SERVER_ERROR, error);
+            const title = 'Error logging in';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 }
