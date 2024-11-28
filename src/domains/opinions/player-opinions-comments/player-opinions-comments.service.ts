@@ -49,6 +49,12 @@ export class PlayerOpinionsCommentsService {
 
     async getOpinionsForPlayer(playerId: string) {
         try {
+            const playerExists = await this.prisma.players.findUnique({
+                where: { id: playerId },
+            });
+            if (!playerExists) {
+                throw new NotFoundException(`Player with ID ${playerId} not found`);
+            }
             const opinions = await this.repository.getOpinionsByPlayerId(playerId);
             if (!opinions) {
                 throw new NotFoundException(`No opinions found for player with ID ${playerId}`);

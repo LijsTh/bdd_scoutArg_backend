@@ -61,6 +61,13 @@ export class TeamOpinionsCommentsService {
 
     async getOpinionsByTeamId(teamId: string) {
         try {
+            const teamExists = await this.prisma.teams.findUnique({
+                where: { id: teamId },
+            });
+            if (!teamExists) {
+                throw new NotFoundException(`Team with ID ${teamId} not found`);
+            }
+
             const opinions = await this.repository.getOpinionsByTeamId(teamId);
             if (!opinions) {
                 throw new NotFoundException(`No opinions found for team with ID ${teamId}`);

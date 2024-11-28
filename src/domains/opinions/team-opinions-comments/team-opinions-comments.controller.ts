@@ -43,7 +43,7 @@ export class TeamOpinionsCommentsController {
         }
     }
 
-    @Get('opinions')
+    @Get('opinions/all')
     @ApiOkResponse({ type: [TeamOpinionEntity] })
     async getOpinions(): Promise<TeamOpinionEntity[]> {
         try {
@@ -53,7 +53,7 @@ export class TeamOpinionsCommentsController {
         }
     }
 
-    @Get('opinion/:id')
+    @Get('opinions/:id')
     @ApiOkResponse({ type: TeamOpinionEntity })
     async getOpinion(@Param('id') id: string): Promise<TeamOpinionEntity> {
         try {
@@ -67,7 +67,7 @@ export class TeamOpinionsCommentsController {
         }
     }
 
-    @Get('opinions/:teamId')
+    @Get('/:teamId/opinions/')
     @ApiOkResponse({ type: [TeamOpinionEntity] })
     async getOpinionsByTeamId(@Param('teamId') teamId: string): Promise<TeamOpinionEntity[]> {
         try {

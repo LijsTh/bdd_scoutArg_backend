@@ -49,7 +49,7 @@ export class PlayerOpinionsCommentsController {
         }
     }
 
-    @Get('opinions')
+    @Get('/opinions/all')
     @ApiOkResponse({ type: [PlayerOpinionEntity] })
     async getOpinions(): Promise<PlayerOpinionEntity[]> {
         try {
@@ -59,7 +59,7 @@ export class PlayerOpinionsCommentsController {
         }
     }
 
-    @Get('opinion/:opinionId')
+    @Get('opinions/:opinionId')
     @ApiOkResponse({ type: PlayerOpinionEntity })
     async getOpinion(@Param() id: string): Promise<PlayerOpinionEntity> {
         try {
@@ -73,9 +73,9 @@ export class PlayerOpinionsCommentsController {
         }
     }
 
-    @Get('opinions/:playerId')
+    @Get('/:playerId/opinions')
     @ApiOkResponse({ type: [PlayerOpinionEntity] })
-    async getOpinionsForPlayer(@Param() playerId: string): Promise<PlayerOpinionEntity[]> {
+    async getOpinionsForPlayer(@Param('playerId') playerId: string): Promise<PlayerOpinionEntity[]> {
         try {
             return await this.service.getOpinionsForPlayer(playerId);
         } catch (error) {
@@ -146,7 +146,7 @@ export class PlayerOpinionsCommentsController {
         }
     }
 
-    @Get('opinion/:opinionId/comments')
+    @Get('opinions/:opinionId/comments')
     @ApiOkResponse({ type: [PlayerCommentEntity] })
     async getComments(@Param('opinionId') opinionId: string): Promise<PlayerCommentEntity[]> {
         try {
