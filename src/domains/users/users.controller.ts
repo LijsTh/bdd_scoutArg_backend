@@ -115,8 +115,7 @@ export class UsersController {
             const title = 'Error logging in';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
-            }
-            else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
