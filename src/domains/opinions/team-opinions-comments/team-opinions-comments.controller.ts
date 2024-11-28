@@ -36,7 +36,7 @@ export class TeamOpinionsCommentsController {
         @Request() req: any,
     ): Promise<TeamOpinionEntity> {
         try {
-            createOpinionDto.user_id = req.user.id;
+            createOpinionDto.user_id = req.user;
             return await this.service.createOpinion(createOpinionDto);
         } catch (error) {
             throw createFormattedError('Error creating Opinion', HttpStatus.INTERNAL_SERVER_ERROR, error);
@@ -90,7 +90,7 @@ export class TeamOpinionsCommentsController {
         @Request() req: any,
     ): Promise<TeamOpinionEntity> {
         try {
-            updateOpinionDto.user_id = req.user.id;
+            updateOpinionDto.user_id = req.user;
             return await this.service.updateOpinion(id, updateOpinionDto);
         } catch (error) {
             const title = 'Error updating Opinion';
@@ -108,7 +108,7 @@ export class TeamOpinionsCommentsController {
     @ApiNoContentResponse({ description: 'Opinion deleted' })
     async deleteOpinion(@Param('id') id: string, @Res() res: Response, @Request() req: any): Promise<void> {
         try {
-            const userID = req.user.id;
+            const userID = req.user;
             await this.service.deleteOpinion(id, userID);
         } catch (error) {
             const title = 'Error deleting Opinion';
@@ -133,7 +133,7 @@ export class TeamOpinionsCommentsController {
         @Request() req: any,
     ): Promise<TeamCommentEntity> {
         try {
-            createCommentDto.user_id = req.user.id;
+            createCommentDto.user_id = req.user;
             return await this.service.addCommentToOpinion(opinionId, createCommentDto);
         } catch (error) {
             throw createFormattedError('Error creating Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
@@ -164,7 +164,7 @@ export class TeamOpinionsCommentsController {
         @Request() req: any,
     ): Promise<TeamCommentEntity> {
         try {
-            updateCommentDto.user_id = req.user.id;
+            updateCommentDto.user_id = req.user;
             return await this.service.updateComment(opinionId, commentId, updateCommentDto);
         } catch (error) {
             const title = 'Error updating Comment';
@@ -187,7 +187,7 @@ export class TeamOpinionsCommentsController {
         @Request() req: any,
     ): Promise<void> {
         try {
-            await this.service.deleteComment(opinionId, commentId, req.user.id);
+            await this.service.deleteComment(opinionId, commentId, req.user);
         } catch (error) {
             const title = 'Error deleting Comment';
             if (error instanceof NotFoundException) {

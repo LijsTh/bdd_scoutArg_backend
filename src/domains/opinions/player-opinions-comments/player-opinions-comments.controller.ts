@@ -96,7 +96,7 @@ export class PlayerOpinionsCommentsController {
         @Request() req: any,
     ): Promise<PlayerOpinionEntity> {
         try {
-            updateOpinionDto.user_id = req.user.id;
+            updateOpinionDto.user_id = req.user;
             return await this.service.updateOpinion(id, updateOpinionDto);
         } catch (error) {
             const title = 'Error updating Opinion';
@@ -114,7 +114,7 @@ export class PlayerOpinionsCommentsController {
     @ApiNoContentResponse({ description: 'Opinion deleted' })
     async deleteOpinion(@Param('id') id: string, @Res() res: Response, @Request() req: any): Promise<void> {
         try {
-            const userID = req.user.id;
+            const userID = req.user;
             await this.service.deleteOpinion(id, userID);
         } catch (error) {
             const title = 'Error deleting Opinion';
@@ -139,7 +139,7 @@ export class PlayerOpinionsCommentsController {
         @Request() req: any,
     ): Promise<PlayerCommentEntity> {
         try {
-            createCommentDto.user_id = req.user.id;
+            createCommentDto.user_id = req.user;
             return await this.service.addCommentToOpinion(opinionId, createCommentDto);
         } catch (error) {
             throw createFormattedError('Error creating Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
@@ -185,7 +185,7 @@ export class PlayerOpinionsCommentsController {
         @Request() req: any,
     ): Promise<PlayerCommentEntity> {
         try {
-            updateCommentDto.user_id = req.user.id;
+            updateCommentDto.user_id = req.user;
             return await this.service.updateComment(opinionId, commentId, updateCommentDto);
         } catch (error) {
             if (error instanceof NotFoundException) {
@@ -207,7 +207,7 @@ export class PlayerOpinionsCommentsController {
         @Request() req: any,
     ): Promise<void> {
         try {
-            await this.service.deleteComment(opinionId, commentId, req.user.id);
+            await this.service.deleteComment(opinionId, commentId, req.user);
         } catch (error) {
             if (error instanceof NotFoundException) {
                 throw createFormattedError('Error deleting Comment', HttpStatus.NOT_FOUND, error);
