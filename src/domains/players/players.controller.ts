@@ -6,6 +6,7 @@ import { UpdatePlayerDto } from './dto/update-player.dto';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PlayerEntity } from './entities/player.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
+import { Prisma } from '@prisma/client';
 
 @Controller('players')
 @ApiTags('Players')
@@ -18,6 +19,9 @@ export class PlayersController {
         try {
             return await this.playersService.create(createPlayerDto);
         } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
+            }
             throw createFormattedError('Error creating Player', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
@@ -28,6 +32,9 @@ export class PlayersController {
         try {
             return await this.playersService.findAll();
         } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
+            }
             throw createFormattedError('Error obtaining Players', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
@@ -41,6 +48,8 @@ export class PlayersController {
             const title = 'Error obtaining Player';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
@@ -59,6 +68,8 @@ export class PlayersController {
             const title = 'Error updating Player';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
@@ -74,6 +85,8 @@ export class PlayersController {
             const title = 'Error deleting Player';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }

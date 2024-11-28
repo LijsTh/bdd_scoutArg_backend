@@ -34,6 +34,9 @@ export class TeamsController {
         try {
             return await this.teamsService.findAll();
         } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
+            }
             throw createFormattedError('Error obtaining Teams', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
@@ -47,6 +50,8 @@ export class TeamsController {
             const title = 'Error obtaining Team';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
@@ -61,6 +66,8 @@ export class TeamsController {
             const title = 'Error obtaining Players by Team ID';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
@@ -75,6 +82,8 @@ export class TeamsController {
             const title = 'Error updating Team';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
@@ -90,6 +99,8 @@ export class TeamsController {
             const title = 'Error deleting Team';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
             }
             throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
