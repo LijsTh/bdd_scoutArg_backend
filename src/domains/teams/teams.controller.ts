@@ -8,6 +8,7 @@ import { TeamEntity } from './entities/team.entity';
 import { PlayerEntity } from '../players/entities/player.entity';
 import { UserEntity } from '../users/entities/user.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
+import { Prisma } from '@prisma/client';
 
 @Controller('teams')
 @ApiTags('Teams')
@@ -20,6 +21,9 @@ export class TeamsController {
         try {
             return new TeamEntity(await this.teamsService.create(createTeamDto));
         } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
+            }
             throw createFormattedError('Error creating Team', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }

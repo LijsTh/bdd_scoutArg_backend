@@ -19,6 +19,7 @@ import { LogInDto, LogInResponseDto } from './dto/login.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { createFormattedError } from '../../utils/exceptions/http-exception/formatted-exeption';
+import { Prisma } from '@prisma/client';
 
 @Controller('users')
 @ApiTags('Users')
@@ -31,6 +32,9 @@ export class UsersController {
         try {
             return new UserEntity(await this.usersService.create(createUserDto));
         } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
+            }
             throw createFormattedError('Error creating User', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }

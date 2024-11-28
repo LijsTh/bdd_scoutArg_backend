@@ -8,7 +8,6 @@ import { Prisma } from '@prisma/client';
 @Catch()
 export class ExceptionFilter extends BaseExceptionFilter {
     private readonly logger = new Logger(ExceptionFilter.name);
-
     catch(exception: any, host: ArgumentsHost) {
         if (exception instanceof Prisma.PrismaClientKnownRequestError) {
             this.handlePrismaException(exception, host);
