@@ -16,28 +16,22 @@ export class PlayerOpinionsCommentsService {
     // -------------------------- Player Opinions --------------------------//
 
     async createOpinion(createOpinionDto: CreatePlayerOpinionDto) {
-        try {
-            const userExists = await this.prisma.users.findUnique({
-                where: { id: createOpinionDto.user_id },
-            });
-            if (!userExists) {
-                throw new NotFoundException(`User with ID ${createOpinionDto.user_id} not found`);
-            }
-
-            const playerExists = await this.prisma.players.findUnique({
-                where: { id: createOpinionDto.player_id },
-            });
-            if (!playerExists) {
-                throw new NotFoundException(`Player with ID ${createOpinionDto.player_id} not found`);
-            }
-
-            return await this.repository.createOpinion(createOpinionDto);
-        } catch (error) {
-            if (error instanceof NotFoundException) {
-                throw error;
-            }
-            throw new InternalServerErrorException(`Error creating opinion: ${error.message}`);
+        const userExists = await this.prisma.users.findUnique({
+            where: { id: createOpinionDto.user_id },
+        });
+        if (!userExists) {
+            throw new NotFoundException(`User with ID ${createOpinionDto.user_id} not found`);
         }
+
+        const playerExists = await this.prisma.players.findUnique({
+            where: { id: createOpinionDto.player_id },
+        });
+
+        if (!playerExists) {
+            throw new NotFoundException(`Player with ID ${createOpinionDto.player_id} not found`);
+        }
+
+        return await this.repository.createOpinion(createOpinionDto);
     }
 
     async getOpinionById(id: string) {

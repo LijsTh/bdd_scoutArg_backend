@@ -4,7 +4,6 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { UserEntity } from '../users/entities/user.entity';
-import { PlayerEntity } from '../players/entities/player.entity';
 
 @Injectable()
 export class TeamsService {
@@ -61,7 +60,7 @@ export class TeamsService {
         });
     }
 
-    async findPlayersByTeamId(teamId: string): Promise<String[]> {
+    async findPlayersByTeamId(teamId: string): Promise<string[]> {
         const team = await this.prisma.teams.findUnique({
             where: {
                 id: teamId,

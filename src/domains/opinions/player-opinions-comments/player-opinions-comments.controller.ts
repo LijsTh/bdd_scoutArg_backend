@@ -11,7 +11,6 @@ import {
     HttpStatus,
     Request,
     ConflictException,
-    Req,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { PlayerOpinionsCommentsService } from './player-opinions-comments.service';
@@ -22,7 +21,7 @@ import { CreatePlayerCommentDto } from './comments_dtos/create-player-comment.dt
 import { PlayerCommentEntity } from './comments_entity/player-comment.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 
-@Controller('player')
+@Controller('players')
 @ApiTags('Player Opinions Comments')
 export class PlayerOpinionsCommentsController {
     constructor(private readonly service: PlayerOpinionsCommentsService) {}
@@ -37,15 +36,16 @@ export class PlayerOpinionsCommentsController {
         @Request() req: any,
     ): Promise<PlayerOpinionEntity> {
         try {
-            createOpinionDto.user_id = req.user.id;
+            createOpinionDto.user_id = req.user;
             const opinion = await this.service.createOpinion(createOpinionDto);
             return opinion;
         } catch (error) {
             const title = 'Error creating Opinion';
             if (error instanceof NotFoundException) {
                 throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else {
+                throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
             }
-            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 

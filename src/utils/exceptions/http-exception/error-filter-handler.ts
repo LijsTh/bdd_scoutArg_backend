@@ -21,6 +21,9 @@ export class ExceptionFilter extends BaseExceptionFilter {
         const status = exception.getStatus ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
         if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
             this.logger.error(`500 Error - ${request.method} ${request.url}: ${exception.message}`, exception.stack);
+            if (exception.response.detail) {
+                this.logger.error(`Detail: ${exception.response.detail}`);
+            }
             response.status(status).json({
                 title: 'Unexpected Server Error',
                 status: exception.response.status,

@@ -6,7 +6,6 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { TeamEntity } from './entities/team.entity';
 import { PlayerEntity } from '../players/entities/player.entity';
-import { UserEntity } from '../users/entities/user.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 import { Prisma } from '@prisma/client';
 
@@ -59,7 +58,7 @@ export class TeamsController {
 
     @Get(':id/players')
     @ApiOkResponse({ type: [PlayerEntity] })
-    async findPlayersByTeam(@Param('id') id: string): Promise<String[]> {
+    async findPlayersByTeam(@Param('id') id: string): Promise<string[]> {
         try {
             return await this.teamsService.findPlayersByTeamId(id);
         } catch (error) {
