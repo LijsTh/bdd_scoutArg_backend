@@ -1,10 +1,17 @@
 import * as jwt from 'jsonwebtoken';
 
 export interface JwtPayload {
+    sub: string;
+    role: 'authenticated';
     userID: string;
 }
 
-export function generateToken(payload: JwtPayload): string {
+export function generateToken(userId: string): string {
+    const payload: JwtPayload = {
+        sub: userId,
+        role: 'authenticated',
+        userID: userId,
+    };
     if (!process.env.JWT_SECRET) {
         throw new Error('JWT_SECRET is not defined');
     }

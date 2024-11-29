@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { TeamEntity } from './entities/team.entity';
 import { PlayerEntity } from '../players/entities/player.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
@@ -16,6 +16,7 @@ export class TeamsController {
 
     @Post()
     @ApiCreatedResponse({ type: TeamEntity })
+    @ApiBearerAuth()
     async create(@Body() createTeamDto: CreateTeamDto): Promise<TeamEntity> {
         try {
             return new TeamEntity(await this.teamsService.create(createTeamDto));
@@ -74,6 +75,7 @@ export class TeamsController {
 
     @Patch(':id')
     @ApiCreatedResponse({ type: TeamEntity })
+    @ApiBearerAuth()
     async update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto): Promise<TeamEntity> {
         try {
             return new TeamEntity(await this.teamsService.update(id, updateTeamDto));
@@ -90,6 +92,7 @@ export class TeamsController {
 
     @Delete(':id')
     @ApiNoContentResponse({ description: 'Team deleted' })
+    @ApiBearerAuth()
     async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
         try {
             await this.teamsService.remove(id);

@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PlayerEntity } from './entities/player.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 import { Prisma } from '@prisma/client';
@@ -15,6 +15,7 @@ export class PlayersController {
 
     @Post()
     @ApiCreatedResponse({ type: PlayerEntity })
+    @ApiBearerAuth()
     async create(@Body() createPlayerDto: CreatePlayerDto): Promise<PlayerEntity> {
         try {
             return await this.playersService.create(createPlayerDto);
@@ -57,6 +58,7 @@ export class PlayersController {
 
     @Patch(':id')
     @ApiCreatedResponse({ type: PlayerEntity })
+    @ApiBearerAuth()
     async update(
         @Param('id') id: string,
         @Body()
@@ -77,6 +79,7 @@ export class PlayersController {
 
     @Delete(':id')
     @ApiNoContentResponse({ description: 'Player deleted' })
+    @ApiBearerAuth()
     async remove(@Param('id') id: string, @Res() res: Response): Promise<void> {
         try {
             await this.playersService.remove(id);
