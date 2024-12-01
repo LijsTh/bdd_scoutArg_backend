@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePlayerDto {
     @IsNotEmpty({ message: 'Name is required.' })
@@ -23,5 +23,7 @@ export class CreatePlayerDto {
     number: number;
 
     @ApiProperty({ required: false, nullable: true, example: 'team123', description: 'Team ID' })
+    @IsOptional()
+    @IsString({ message: 'Team ID must be a string.' })
     team_id?: string; // Clave foránea hacia 'team', opcional
 }
