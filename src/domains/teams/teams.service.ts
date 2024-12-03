@@ -75,6 +75,21 @@ export class TeamsService {
         return team.players ? team.players.map((player) => player.id) : [];
     }
 
+    async findUsersByTeamId(teamId: string): Promise<number> {
+        const team = await this.prisma.teams.findUnique({
+            where: {
+                id: teamId,
+            },
+            include: {
+                users: true,
+            },
+        });
+        if (!team) {
+            throw new NotFoundException(`Team with id ${teamId} not found`);
+        }
+        return team.users ? team.users.length : 0;
+    }
+
     async update(id: string, updateTeamDto: UpdateTeamDto): Promise<TeamEntity> {
         const team = await this.prisma.teams.update({
             where: {

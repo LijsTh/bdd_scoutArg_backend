@@ -73,6 +73,22 @@ export class TeamsController {
         }
     }
 
+    @Get(':id/users')
+    @ApiOkResponse({ type: Number })
+    async findUsersByTeam(@Param('id') id: string): Promise<number> {
+        try {
+            return await this.teamsService.findUsersByTeamId(id);
+        } catch (error) {
+            const title = 'Error obtaining Users by Team ID';
+            if (error instanceof NotFoundException) {
+                throw createFormattedError(title, HttpStatus.NOT_FOUND, error);
+            } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
+            }
+            throw createFormattedError(title, HttpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+
     @Patch(':id')
     @ApiCreatedResponse({ type: TeamEntity })
     @ApiBearerAuth()
