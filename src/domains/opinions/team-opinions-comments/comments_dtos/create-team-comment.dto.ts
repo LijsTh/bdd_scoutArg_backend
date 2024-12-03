@@ -3,17 +3,7 @@ import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, IsDate } from 'class-validator';
 
 export class CreateTeamCommentDto {
-    @ApiProperty({ example: 'user123', description: 'User ID' })
-    @IsString()
-    @IsNotEmpty()
-    user_id: string;
-
-    @ApiProperty({
-        example: 'opinion123',
-        description: 'Player opinion ID to reference.',
-    })
-    @IsString()
-    @IsNotEmpty()
+    user_id?: string;
     opinion_team_id: string;
 
     @ApiProperty({ example: 'Totally agree.', description: 'Comment text' })

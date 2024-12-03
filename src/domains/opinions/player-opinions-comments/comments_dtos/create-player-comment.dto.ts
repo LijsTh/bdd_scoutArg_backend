@@ -4,13 +4,6 @@ import { IsString, IsNotEmpty, IsDate } from 'class-validator';
 
 export class CreatePlayerCommentDto {
     user_id?: string;
-
-    @ApiProperty({
-        example: 'opinion123',
-        description: 'Player opinion ID to reference.',
-    })
-    @IsNotEmpty({ message: 'Player opinion ID is required.' })
-    @IsString({ message: 'Player opinion ID must be a string.' })
     player_opinion_id: string;
 
     @ApiProperty({ example: 'Totally agree.', description: 'Comment text' })
