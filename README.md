@@ -6,14 +6,14 @@ This repository contains the back-end infrastructure for a football-focused webs
 
 ## Authors
 
-| Nombre          | Apellido        | Padrón  | Gmail                   |
-|-----------------|----------------|---------|-------------------------|
-| Joaquin         | Batemarco      | 110222  | jbatemarco@fi.uba.ar    |
-| Franco Ariel    | Alani          | 111147  | falani@fi.uba.ar        |
-| Franco Martin   | Fusco          | 102692  | ffusco@fi.uba.ar        |
-| Benicio         | Braunstein     | 110126  | bbraunstein@fi.uba.ar   |
-| Juan Martin     | de la Cruz     | 109588  | jdelacruz@fi.uba.ar     |
-| Theo            | Lijs           | 109472  | tlijs@fi.uba.ar         |  
+| Nombre        | Apellido   | Padrón | Gmail                 |
+| ------------- | ---------- | ------ | --------------------- |
+| Joaquin       | Batemarco  | 110222 | jbatemarco@fi.uba.ar  |
+| Franco Ariel  | Alani      | 111147 | falani@fi.uba.ar      |
+| Franco Martin | Fusco      | 102692 | ffusco@fi.uba.ar      |
+| Benicio       | Braunstein | 110126 | bbraunstein@fi.uba.ar |
+| Juan Martin   | de la Cruz | 109588 | jdelacruz@fi.uba.ar   |
+| Theo          | Lijs       | 109472 | tlijs@fi.uba.ar       |
 
 ---
 
