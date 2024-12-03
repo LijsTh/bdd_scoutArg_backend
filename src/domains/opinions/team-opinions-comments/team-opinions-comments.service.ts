@@ -144,11 +144,9 @@ export class TeamOpinionsCommentsService {
                 throw new NotFoundException(`User with ID ${createCommentDto.user_id} not found`);
             }
 
-            const teamExists = await this.prisma.teams.findUnique({
-                where: { id: createCommentDto.opinion_team_id },
-            });
-            if (!teamExists) {
-                throw new NotFoundException(`Team with ID ${createCommentDto.opinion_team_id} not found`);
+            const doc = await this.repository.getOpinionById(opinionId);
+            if (!doc) {
+                throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
             }
 
             createCommentDto.opinion_team_id = opinionId;
