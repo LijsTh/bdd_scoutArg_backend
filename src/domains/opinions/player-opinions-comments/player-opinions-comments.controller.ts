@@ -142,6 +142,9 @@ export class PlayerOpinionsCommentsController {
             createCommentDto.user_id = req.user;
             return await this.service.addCommentToOpinion(opinionId, createCommentDto);
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw createFormattedError('Error creating Comment', HttpStatus.NOT_FOUND, error);
+            }
             throw createFormattedError('Error creating Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }

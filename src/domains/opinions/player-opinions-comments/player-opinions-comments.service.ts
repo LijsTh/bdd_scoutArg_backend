@@ -145,7 +145,8 @@ export class PlayerOpinionsCommentsService {
                 throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
             }
 
-            return await this.repository.addComment(opinionId, createCommentDto);
+            createCommentDto.player_opinion_id = opinionId;
+            return await this.repository.addComment(createCommentDto);
         } catch (error) {
             if (error instanceof NotFoundException) {
                 throw error;
@@ -156,6 +157,10 @@ export class PlayerOpinionsCommentsService {
 
     async getCommentsForOpinion(opinionId: string) {
         try {
+            const opinion = await this.repository.getOpinionById(opinionId);
+            if (!opinion) {
+                throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
+            }
             const comments = await this.repository.getCommentsForOpinion(opinionId);
             if (!comments) {
                 throw new NotFoundException(`No comments found for opinion with ID ${opinionId}`);
@@ -169,6 +174,10 @@ export class PlayerOpinionsCommentsService {
 
     async getCommentByIdForOpinion(opinionId: string, commentId: string) {
         try {
+            const opinion = await this.repository.getOpinionById(opinionId);
+            if (!opinion) {
+                throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
+            }
             const comment = await this.repository.getCommentByIdForOpinion(opinionId, commentId);
             if (!comment) {
                 throw new NotFoundException(`Comment with ID ${commentId} not found for opinion with ID ${opinionId}`);

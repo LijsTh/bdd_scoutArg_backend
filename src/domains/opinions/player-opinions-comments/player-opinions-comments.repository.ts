@@ -7,11 +7,13 @@ import { CreatePlayerCommentDto } from './comments_dtos/create-player-comment.dt
 @Injectable()
 export class PlayersOpinionsCommentsRepository {
     private playerOpinionsCollection: FirebaseFirestore.CollectionReference;
+    private playerCommentsCollection: FirebaseFirestore.CollectionReference;
 
     constructor(private firebaseService: FirebaseService) {}
 
     async onModuleInit() {
         this.playerOpinionsCollection = this.firebaseService.playerOpinionsCollection;
+        this.playerCommentsCollection = this.firebaseService.playerCommentsCollection;
     }
 
     // -------------------------- Player Opinions --------------------------//
@@ -54,32 +56,45 @@ export class PlayersOpinionsCommentsRepository {
 
     // -------------------------- Player Comments --------------------------//
 
-    async addComment(opinionId: string, comment: CreatePlayerCommentDto): Promise<any> {
+    async addComment(comment: CreatePlayerCommentDto): Promise<any> {
         const plainComment = JSON.parse(JSON.stringify(comment));
-        const commentsRef = this.playerOpinionsCollection.doc(opinionId).collection('comments');
-        return commentsRef.add(plainComment);
+        const commentsRef = await this.playerCommentsCollection.add(plainComment);
+        return { id: commentsRef.id, ...comment };
     }
 
     async getCommentsForOpinion(opinionId: string): Promise<any[]> {
-        const snapshot = await this.playerOpinionsCollection.doc(opinionId).collection('comments').get();
+        const snapshot = await this.playerCommentsCollection.where('opinion_id', '==', opinionId).get();
         return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     }
 
     async getCommentByIdForOpinion(opinionId: string, commentId: string): Promise<any> {
-        const commentRef = this.playerOpinionsCollection.doc(opinionId).collection('comments').doc(commentId);
+        const commentRef = this.playerCommentsCollection.doc(commentId);
         const commentSnapshot = await commentRef.get();
-        return commentSnapshot.exists ? { id: commentSnapshot.id, ...commentSnapshot.data() } : null;
+        const commentData = commentSnapshot.data();
+        if (!commentData || commentData.opinion_id !== opinionId) {
+            return null;
+        }
+        return commentSnapshot.exists ? { id: commentSnapshot.id, ...commentData } : null;
     }
 
     async updateComment(opinionId: string, commentId: string, comment: any): Promise<any> {
         const plainComment = JSON.parse(JSON.stringify(comment));
-        await this.playerOpinionsCollection.doc(opinionId).collection('comments').doc(commentId).update(plainComment);
-        return { id: commentId, ...comment };
+        const commentRef = this.playerCommentsCollection.doc(commentId);
+        const commentSnapshot = await commentRef.get();
+        const commentData = commentSnapshot.data();
+        if (!commentData || commentData.opinion_id !== opinionId) {
+            return null;
+        }
+        await commentRef.update(plainComment);
     }
 
     async deleteComment(opinionId: string, commentId: string): Promise<any> {
-        const commentRef = this.playerOpinionsCollection.doc(opinionId).collection('comments').doc(commentId);
+        const commentRef = this.playerCommentsCollection.doc(commentId);
         const commentSnapshot = await commentRef.get();
+        const commentData = commentSnapshot.data();
+        if (!commentData || commentData.opinion_id !== opinionId) {
+            return null;
+        }
         const deletedID = commentSnapshot.id;
         const deletedData = commentSnapshot.data();
         await commentRef.delete();
