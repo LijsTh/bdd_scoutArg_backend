@@ -63,7 +63,7 @@ export class PlayersOpinionsCommentsRepository {
     }
 
     async getCommentsForOpinion(opinionId: string): Promise<any[]> {
-        const snapshot = await this.playerCommentsCollection.where('opinion_id', '==', opinionId).get();
+        const snapshot = await this.playerCommentsCollection.where('player_opinion_id', '==', opinionId).get();
         return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     }
 
@@ -71,7 +71,7 @@ export class PlayersOpinionsCommentsRepository {
         const commentRef = this.playerCommentsCollection.doc(commentId);
         const commentSnapshot = await commentRef.get();
         const commentData = commentSnapshot.data();
-        if (!commentData || commentData.opinion_id !== opinionId) {
+        if (!commentData || commentData.player_opinion_id !== opinionId) {
             return null;
         }
         return commentSnapshot.exists ? { id: commentSnapshot.id, ...commentData } : null;
@@ -82,7 +82,7 @@ export class PlayersOpinionsCommentsRepository {
         const commentRef = this.playerCommentsCollection.doc(commentId);
         const commentSnapshot = await commentRef.get();
         const commentData = commentSnapshot.data();
-        if (!commentData || commentData.opinion_id !== opinionId) {
+        if (!commentData || commentData.player_opinion_id !== opinionId) {
             return null;
         }
         await commentRef.update(plainComment);
@@ -92,7 +92,7 @@ export class PlayersOpinionsCommentsRepository {
         const commentRef = this.playerCommentsCollection.doc(commentId);
         const commentSnapshot = await commentRef.get();
         const commentData = commentSnapshot.data();
-        if (!commentData || commentData.opinion_id !== opinionId) {
+        if (!commentData || commentData.player_opinion_id !== opinionId) {
             return null;
         }
         const deletedID = commentSnapshot.id;
