@@ -133,9 +133,12 @@ export class TeamOpinionsCommentsController {
         @Request() req: any,
     ): Promise<TeamCommentEntity> {
         try {
-            createCommentDto.user_id = req.user.id;
+            createCommentDto.user_id = req.user;
             return await this.service.addCommentToOpinion(opinionId, createCommentDto);
         } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw createFormattedError('Error creating Comment', HttpStatus.NOT_FOUND, error);
+            }
             throw createFormattedError('Error creating Comment', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
@@ -164,7 +167,7 @@ export class TeamOpinionsCommentsController {
         @Request() req: any,
     ): Promise<TeamCommentEntity> {
         try {
-            updateCommentDto.user_id = req.user.id;
+            updateCommentDto.user_id = req.user;
             return await this.service.updateComment(opinionId, commentId, updateCommentDto);
         } catch (error) {
             const title = 'Error updating Comment';
