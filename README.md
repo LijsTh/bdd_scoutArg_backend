@@ -133,15 +133,6 @@ To start the project in watch mode, which restarts the application on file chang
 $ npm run start:dev
 ```
 
-### Production Mode
-
-To start the project in production mode, use:
-
-```bash
-$ npm run start:prod
-```
-
----
 
 ## Prisma Considerations
 
