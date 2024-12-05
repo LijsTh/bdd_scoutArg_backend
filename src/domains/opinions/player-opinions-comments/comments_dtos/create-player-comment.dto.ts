@@ -9,7 +9,7 @@ export class CreatePlayerCommentDto {
     @ApiProperty({ example: 'Totally agree.', description: 'Comment text' })
     @IsNotEmpty({ message: 'Comment text is required.' })
     @IsString({ message: 'Comment text must be a string.' })
-    opinion_text: string;
+    comment_text: string;
 
     @ApiProperty({
         example: '2023-11-25T12:34:56.789Z',

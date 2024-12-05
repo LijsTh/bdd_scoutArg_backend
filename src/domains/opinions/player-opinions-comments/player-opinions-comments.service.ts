@@ -94,8 +94,12 @@ export class PlayerOpinionsCommentsService {
             if (!opinion) {
                 throw new NotFoundException(`Opinion with ID ${id} not found`);
             }
-            if (opinion.user_id !== updateOpinionDto.user_id) {
+            if (opinion.user_id !== updateOpinionDto.user_id && updateOpinionDto.user_id !== process.env.ADMIN_USER) {
                 throw new ConflictException('The user_id does not match the user_id of the opinion');
+            }
+
+            if (updateOpinionDto.user_id == process.env.ADMIN_USER) {
+                updateOpinionDto.user_id = opinion.user_id;
             }
 
             const updatedOpinion = await this.repository.updateOpinion(id, updateOpinionDto);
@@ -115,7 +119,7 @@ export class PlayerOpinionsCommentsService {
             if (!opinion) {
                 throw new NotFoundException(`Opinion with ID ${id} not found`);
             }
-            if (opinion.user_id !== userID) {
+            if (opinion.user_id !== userID && userID !== process.env.ADMIN_USER) {
                 throw new ConflictException('The user_id does not match the user_id of the opinion');
             }
             const result = await this.repository.deleteOpinion(id);
@@ -125,6 +129,7 @@ export class PlayerOpinionsCommentsService {
             return result;
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
+            if (error instanceof ConflictException) throw error;
             throw new InternalServerErrorException(`Error deleting opinion: ${error.message}`);
         }
     }
@@ -207,14 +212,17 @@ export class PlayerOpinionsCommentsService {
             if (!comment) {
                 throw new NotFoundException(`Comment with ID ${commentId} not found for opinion with ID ${opinionId}`);
             }
-            if (comment.user_id !== updateCommentDto.user_id) {
+
+            if (comment.user_id !== updateCommentDto.user_id && updateCommentDto.user_id !== process.env.ADMIN_USER) {
                 throw new ConflictException('The user_id does not match the user_id of the comment');
             }
 
-            const updatedComment = await this.repository.updateComment(opinionId, commentId, updateCommentDto);
-            if (!updatedComment) {
-                throw new NotFoundException(`Comment with ID ${commentId} not found for opinion with ID ${opinionId}`);
+            if (updateCommentDto.user_id == process.env.ADMIN_USER) {
+                updateCommentDto.user_id = comment.user_id;
             }
+
+            const updatedComment = await this.repository.updateComment(opinionId, commentId, updateCommentDto);
+
             return updatedComment;
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
@@ -228,7 +236,7 @@ export class PlayerOpinionsCommentsService {
             if (!opinion) {
                 throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
             }
-            if (opinion.user_id !== userId) {
+            if (opinion.user_id !== userId && userId !== process.env.ADMIN_USER) {
                 throw new ConflictException('The user_id does not match the user_id of the opinion');
             }
             const result = await this.repository.deleteComment(opinionId, commentId);
@@ -239,6 +247,22 @@ export class PlayerOpinionsCommentsService {
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
             throw new InternalServerErrorException(`Error deleting comment: ${error.message}`);
+        }
+    }
+
+    async deleteOpinionsByPlayerId(playerId: string) {
+        try {
+            const opinions = await this.repository.getOpinionsByPlayerId(playerId);
+            if (!opinions) {
+                throw new NotFoundException(`No opinions found for player with ID ${playerId}`);
+            }
+
+            for (const opinion of opinions) {
+                await this.repository.deleteOpinion(opinion.id);
+            }
+        } catch (error) {
+            if (error instanceof NotFoundException) throw error;
+            throw new InternalServerErrorException(`Error deleting opinions: ${error.message}`);
         }
     }
 }

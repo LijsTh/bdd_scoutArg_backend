@@ -47,6 +47,11 @@ export class TeamOpinionsCommentsRepository {
         const docSnapshot = await docRef.get();
         const deletedID = docSnapshot.id;
         const deletedData = docSnapshot.data();
+        // Deletes comments associated with the opinion
+        const commentsSnapshot = await this.teamCommentsCollection.where('opinion_team_id', '==', id).get();
+        commentsSnapshot.docs.forEach(async (comment) => {
+            await comment.ref.delete();
+        });
         await docRef.delete();
         return { id: deletedID, ...deletedData };
     }
@@ -83,6 +88,11 @@ export class TeamOpinionsCommentsRepository {
             return null;
         }
         await commentRef.update(plainComment);
+
+        const updatedCommentSnapshot = await commentRef.get();
+        const updatedCommentData = updatedCommentSnapshot.data();
+
+        return { id: updatedCommentSnapshot.id, ...updatedCommentData };
     }
 
     async deleteComment(opinionId: string, commentId: string): Promise<any> {

@@ -119,7 +119,7 @@ export class TeamOpinionsCommentsService {
             if (!opinion) {
                 throw new NotFoundException(`Opinion with ID ${id} not found`);
             }
-            if (opinion.user_id !== usedID) {
+            if (opinion.user_id !== usedID && usedID !== process.env.ADMIN_USER) {
                 throw new ConflictException('The user_id does not match the user_id of the opinion');
             }
             const result = await this.repository.deleteOpinion(id);
@@ -239,7 +239,7 @@ export class TeamOpinionsCommentsService {
             if (!opinion) {
                 throw new NotFoundException(`Opinion with ID ${opinionId} not found`);
             }
-            if (opinion.user_id !== userId) {
+            if (opinion.user_id !== userId && userId !== process.env.ADMIN_USER) {
                 throw new ConflictException('The user_id does not match the user_id of the opinion');
             }
             const result = await this.repository.deleteComment(opinionId, commentId);
@@ -250,6 +250,22 @@ export class TeamOpinionsCommentsService {
         } catch (error) {
             if (error instanceof NotFoundException) throw error;
             throw new InternalServerErrorException(`Error deleting comment: ${error.message}`);
+        }
+    }
+
+    async deleteOpinionsByTeamId(teamId: string) {
+        try {
+            const opinions = await this.repository.getOpinionsByTeamId(teamId);
+            if (!opinions) {
+                throw new NotFoundException(`No opinions found for team with ID ${teamId}`);
+            }
+
+            for (const opinion of opinions) {
+                await this.repository.deleteOpinion(opinion.id);
+            }
+        } catch (error) {
+            if (error instanceof NotFoundException) throw error;
+            throw new InternalServerErrorException(`Error deleting opinions: ${error.message}`);
         }
     }
 }

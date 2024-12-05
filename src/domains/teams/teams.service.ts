@@ -3,11 +3,15 @@ import { TeamEntity } from './entities/team.entity';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { TeamOpinionsCommentsService } from '../opinions/team-opinions-comments/team-opinions-comments.service';
 import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class TeamsService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly opinions: TeamOpinionsCommentsService,
+    ) {}
 
     async create(createTeamDto: CreateTeamDto): Promise<TeamEntity> {
         const team = await this.prisma.teams.create({
@@ -112,6 +116,18 @@ export class TeamsService {
     }
 
     async remove(id: string): Promise<TeamEntity> {
+        const exists = await this.prisma.teams.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!exists) {
+            throw new NotFoundException(`Team with id ${id} not found`);
+        }
+
+        await this.opinions.deleteOpinionsByTeamId(id);
+
         const teamDeleted = await this.prisma.teams.delete({
             where: {
                 id,
@@ -121,9 +137,16 @@ export class TeamsService {
                 players: true,
             },
         });
-        if (!teamDeleted) {
-            throw new NotFoundException(`Team with id ${id} not found`);
-        }
+
+        await this.prisma.users.updateMany({
+            where: {
+                team_id: id,
+            },
+            data: {
+                team_id: null,
+            },
+        });
+
         return new TeamEntity({
             ...teamDeleted,
             users: teamDeleted.users ? teamDeleted.users.map((user) => new UserEntity(user)) : [],

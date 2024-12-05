@@ -61,7 +61,7 @@ export class PlayerOpinionsCommentsController {
 
     @Get('opinions/:opinionId')
     @ApiOkResponse({ type: PlayerOpinionEntity })
-    async getOpinion(@Param() id: string): Promise<PlayerOpinionEntity> {
+    async getOpinion(@Param('opinionId') id: string): Promise<PlayerOpinionEntity> {
         try {
             return await this.service.getOpinionById(id);
         } catch (error) {
@@ -91,7 +91,7 @@ export class PlayerOpinionsCommentsController {
     @ApiBearerAuth()
     @ApiOkResponse({ type: PlayerOpinionEntity })
     async updateOpinion(
-        @Param('id') id: string,
+        @Param('opinionId') id: string,
         @Body() updateOpinionDto: CreatePlayerOpinionDto,
         @Request() req: any,
     ): Promise<PlayerOpinionEntity> {

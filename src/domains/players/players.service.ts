@@ -2,11 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { PlayerOpinionsCommentsService } from '../opinions/player-opinions-comments/player-opinions-comments.service';
 import { PlayerEntity } from './entities/player.entity';
 
 @Injectable()
 export class PlayersService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly opinions: PlayerOpinionsCommentsService,
+    ) {}
 
     async create(createPlayerDto: CreatePlayerDto): Promise<PlayerEntity> {
         return await this.prisma.players.create({
@@ -63,6 +67,18 @@ export class PlayersService {
     }
 
     async remove(id: string) {
+        const exists = await this.prisma.players.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!exists) {
+            throw new NotFoundException(`Player with id ${id} not found`);
+        }
+
+        await this.opinions.deleteOpinionsByPlayerId(id);
+
         const playerDeleted = await this.prisma.players.delete({
             where: {
                 id,
@@ -71,6 +87,9 @@ export class PlayersService {
         if (!playerDeleted) {
             throw new NotFoundException(`Player with id ${id} not found`);
         }
+
+        // Delete all comments for this player
+
         return playerDeleted;
     }
 }

@@ -50,6 +50,10 @@ export class PlayersOpinionsCommentsRepository {
         const docSnapshot = await docRef.get();
         const deletedID = docSnapshot.id;
         const deletedData = docSnapshot.data();
+        const commentsSnapshot = await this.playerCommentsCollection.where('player_opinion_id', '==', id).get();
+        commentsSnapshot.docs.forEach(async (comment) => {
+            await comment.ref.delete();
+        });
         await docRef.delete();
         return { id: deletedID, ...deletedData };
     }
@@ -71,10 +75,12 @@ export class PlayersOpinionsCommentsRepository {
         const commentRef = this.playerCommentsCollection.doc(commentId);
         const commentSnapshot = await commentRef.get();
         const commentData = commentSnapshot.data();
+        console.log(commentData);
+
         if (!commentData || commentData.player_opinion_id !== opinionId) {
             return null;
         }
-        return commentSnapshot.exists ? { id: commentSnapshot.id, ...commentData } : null;
+        return { id: commentSnapshot.id, ...commentData };
     }
 
     async updateComment(opinionId: string, commentId: string, comment: any): Promise<any> {
@@ -86,6 +92,11 @@ export class PlayersOpinionsCommentsRepository {
             return null;
         }
         await commentRef.update(plainComment);
+
+        const updatedCommentSnapshot = await commentRef.get();
+        const updatedCommentData = updatedCommentSnapshot.data();
+
+        return { id: updatedCommentSnapshot.id, ...updatedCommentData };
     }
 
     async deleteComment(opinionId: string, commentId: string): Promise<any> {
