@@ -15,4 +15,7 @@ export class TeamCommentEntity {
         description: 'Creation date',
     })
     created_at: string;
+
+    @ApiProperty({ example: 'John Doe', description: 'Author name' })
+    author: string;
 }

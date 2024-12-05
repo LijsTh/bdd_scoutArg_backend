@@ -19,4 +19,9 @@ export class CreateTeamCommentDto {
     @IsDate({ message: 'Creation date must be date.' })
     @Type(() => Date)
     created_at: Date;
+
+    @ApiProperty({ example: 'John Doe', description: 'Author name' })
+    @IsNotEmpty({ message: 'Author name is required.' })
+    @IsString({ message: 'Author name must be a string.' })
+    author: string;
 }

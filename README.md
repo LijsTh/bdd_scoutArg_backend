@@ -133,7 +133,6 @@ To start the project in watch mode, which restarts the application on file chang
 $ npm run start:dev
 ```
 
-
 ## Prisma Considerations
 
 Prisma is an ORM (Object-Relational Mapping) tool that facilitates communication between your application and the database. Below are the commands related to Prisma and its integration into the project.
