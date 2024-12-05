@@ -3,7 +3,14 @@ import { Response } from 'express';
 import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
-import { ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiCreatedResponse,
+    ApiNoContentResponse,
+    ApiOkResponse,
+    ApiTags,
+    ApiBearerAuth,
+    ApiResponse,
+} from '@nestjs/swagger';
 import { PlayerEntity } from './entities/player.entity';
 import { createFormattedError } from 'src/utils/exceptions/http-exception/formatted-exeption';
 import { Prisma } from '@prisma/client';
@@ -37,6 +44,20 @@ export class PlayersController {
                 throw error;
             }
             throw createFormattedError('Error obtaining Players', HttpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+
+    @Get('/without-team')
+    @ApiResponse({ status: 198, type: PlayerEntity, isArray: true })
+    @ApiBearerAuth()
+    async getPlayersWithoutTeam(): Promise<PlayerEntity[]> {
+        try {
+            return await this.playersService.getPlayersWithoutTeam();
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                throw error;
+            }
+            throw createFormattedError('Error obtaining Players without team', HttpStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 

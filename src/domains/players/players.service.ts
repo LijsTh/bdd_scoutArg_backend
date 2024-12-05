@@ -92,4 +92,12 @@ export class PlayersService {
 
         return playerDeleted;
     }
+
+    async getPlayersWithoutTeam(): Promise<PlayerEntity[]> {
+        return await this.prisma.players.findMany({
+            where: {
+                team_id: null,
+            },
+        });
+    }
 }
