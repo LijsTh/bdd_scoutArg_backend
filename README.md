@@ -117,9 +117,11 @@ JWT_SECRET='example_jwt'
 
 ## Compile and Run the Project
 
+To run the project, if this is your first time, you will need to generate the Prisma client to ensure that Prisma is properly set up. You can do so by following these steps: [Generate Prisma Client](#1-generate-prisma-client).
+
 ### Development Mode
 
-To start the project in development mode, where it automatically reloads on code changes, run:
+To start the project in development mode, where it automatically reloads when code changes are made, run:
 
 ```bash
 $ npm run start
@@ -127,11 +129,13 @@ $ npm run start
 
 ### Watch Mode
 
-To start the project in watch mode, which restarts the application on file changes, run:
+To start the project in watch mode, which restarts the application when file changes occur, run:
 
 ```bash
 $ npm run start:dev
 ```
+
+---
 
 ## Prisma Considerations
 
