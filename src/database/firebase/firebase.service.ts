@@ -28,4 +28,3 @@ export class FirebaseService implements OnModuleInit {
         }
     }
 }
-
